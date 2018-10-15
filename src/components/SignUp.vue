@@ -100,14 +100,13 @@ export default {
       evt.preventDefault()
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
         (user) => {
-          // console.log(user)
-          // user.updateProfile({
-          //   displayName: this.firstName.trim() + ' ' + this.lastName.trim()
-          // }).then(function () {
-          //   // Update successful.
-          // }).catch(function (error) {
-          //   throw new Error('Error updating user info' + error)
-          // })
+          user.user.updateProfile({
+            displayName: this.firstName.trim() + ' ' + this.lastName.trim()
+          }).then(function () {
+            // Update successful.
+          }).catch(function (error) {
+            throw new Error('Error updating user info' + error)
+          })
           db.collection('metadata').doc(user.user.uid).set({
             displayName: this.firstName.trim() + ' ' + this.lastName.trim(),
             firstName: this.firstName.trim(),
