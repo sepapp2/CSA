@@ -9,16 +9,6 @@
 
         <b-collapse is-nav id="nav_collapse">
 
-<<<<<<< HEAD
-=======
-          <b-navbar-nav>
-            <b-nav-item to="/conferences">Conferences</b-nav-item>
-          </b-navbar-nav>
-          <b-navbar-nav>
-            <b-nav-item v-if="user" to="/myconferences">My Conferences</b-nav-item>
-          </b-navbar-nav>
->>>>>>> 84c388cdff17cca7341f6df968e8ce7e2ebfbf99
-
           <!-- Right aligned nav items -->
           <b-navbar-nav class="ml-auto">
             <b-nav-item v-if="!user" to="/login">Login</b-nav-item>
