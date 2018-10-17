@@ -114,19 +114,17 @@ export default {
             lastName: this.lastName.trim(),
             admin: false,
             email: this.email,
-            credentials: this.credentials,
             phone: this.phone,
             address: this.address,
             address2: this.address2,
             city: this.city,
             state: this.state,
             zip: this.zip,
-            uid: user.user.uid,
-            admin: false
+            uid: user.user.uid
           })
           firebase.database().ref('metadata/' + user.user.uid + '/refreshTime')
           alert('Your account has been created.')
-          this.$router.replace('login')
+          this.$router.replace('home')
         },
         (err) => {
           console.log(err)
