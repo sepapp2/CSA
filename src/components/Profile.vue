@@ -244,7 +244,7 @@ export default {
         address2: this.userInfo.address2,
         city: this.userInfo.city,
         state: this.userInfo.state,
-        zip: this.userInfo.zip,
+        zip: this.userInfo.zip
       }).then(function () {
         alert('Profile successfully updated')
       }).catch(function (error) {

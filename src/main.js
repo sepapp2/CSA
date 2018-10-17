@@ -14,6 +14,7 @@ import { store } from './store/store'
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
+Vue.use(require('vue-moment'))
 Vue.use(VueFire)
 firebase.initializeApp(config)
 export const storage = firebase.storage()

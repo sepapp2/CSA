@@ -121,7 +121,8 @@ export default {
             city: this.city,
             state: this.state,
             zip: this.zip,
-            uid: user.user.uid
+            uid: user.user.uid,
+            admin: false
           })
           firebase.database().ref('metadata/' + user.user.uid + '/refreshTime')
           alert('Your account has been created.')

@@ -26,10 +26,12 @@ export const store = new Vuex.Store({
           if (doc.exists) {
             state.userProfile = doc.data()
           } else {
+            state.userProfile.admin = false
           }
         })
       } else {
         state.userProfile = []
+        state.userProfile.admin = false
       }
     }
   },
