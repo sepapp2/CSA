@@ -51,7 +51,7 @@ export default {
     login: function () {
       Firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
         (user) => {
-          this.$router.replace('#')
+          this.$router.replace('/')
         },
         (err) => {
           alert('Problem logging in. ' + err.message)
