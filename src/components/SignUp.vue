@@ -75,6 +75,11 @@ import firebase from 'firebase'
 
 export default {
   name: 'signUp',
+  firestore () {
+    return {
+      states: db.collection('States').orderBy('id')
+    }
+  },
   data () {
     return {
       states: [],
@@ -124,7 +129,7 @@ export default {
           })
           firebase.database().ref('metadata/' + user.user.uid + '/refreshTime')
           alert('Your account has been created.')
-          this.$router.replace('home')
+          this.$router.replace('login')
         },
         (err) => {
           console.log(err)
@@ -164,7 +169,7 @@ span{
   font-size: 11px;
 }
 .mb-3 {
-  height: 3.5rem!important;
+  height: 2.45rem!important;
   margin-bottom: 0px!important;
   margin-top: 10px;
 }

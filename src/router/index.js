@@ -6,8 +6,9 @@ import SignUp from '@/components/SignUp'
 import Profile from '@/components/Profile'
 import Products from '@/components/Products'
 import Users from '@/components/Users'
+import Cart from '@/components/Cart'
 import firebase from 'firebase'
-// import { store } from '@/store/store'
+import { db } from '../main'
 
 Vue.use(Router)
 
@@ -24,7 +25,10 @@ let router = new Router({
     {
       path: '/home',
       name: 'Home',
-      component: Home
+      component: Home,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/login',
@@ -39,25 +43,69 @@ let router = new Router({
     {
       path: '/profile',
       name: 'Profile',
-      component: Profile
+      component: Profile,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/products',
       name: 'Products',
-      component: Products
+      component: Products,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      }
     },
     {
       path: '/users',
       name: 'Users',
-      component: Users
+      component: Users,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      }
+    },
+    {
+      path: '/cart',
+      name: 'Cart',
+      component: Cart,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
 
-// router.beforeEach((to, from, next) => {
-//   let currentUser = firebase.auth().currentUser
-//   // let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-//   if (!currentUser) next('login')
-// })
+router.beforeEach((to, from, next) => {
+  let currentUser = firebase.auth().currentUser
+  let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  let requiresAdmin = to.matched.some(record => record.meta.requiresAdmin)
+  let isAdmin = false
+  if (currentUser != null) {
+    isAdmin = db.collection('metadata').doc(firebase.auth().currentUser.uid).get().then(function (doc) {
+      if (doc.exists) {
+        return doc.data()
+      } else {
+        return false
+      }
+    }).catch(function (error) {
+      console.log('Error getting document:', error)
+    })
+  } else {
+    isAdmin = false
+  }
+  if (requiresAuth && !currentUser) next('login')
+  else if (!requiresAuth && currentUser) next()
+  else if (requiresAuth && requiresAdmin) {
+    isAdmin.then(function (result) {
+      if (result.admin) {
+        next()
+      } else {
+        next('home')
+      }
+    })
+  } else next()
+})
 
 export default router

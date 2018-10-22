@@ -8,6 +8,8 @@
                    hover
                    :items="users"
                    :fields="fields"
+                   :current-page="currentPage"
+                   :per-page="perPage"
           >
           <template slot="admin" v-if="userProfile.admin" slot-scope="item">
             <b-form-select v-model="item.item.admin" :options="adminOptions" class="mb-3 select-table-row" @change="changeRole(item.item)"/>
@@ -18,6 +20,11 @@
             </b-button>
           </template>
           </b-table>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="6" offset-md="3" class="my-1">
+            <b-pagination :total-rows="users.length" :per-page="perPage" v-model="currentPage" class="my-0" />
         </b-col>
       </b-row>
       <b-form>
@@ -59,7 +66,7 @@
             </b-col>
             <b-col sm="12" md="3">
               <div>
-                <b-form-select v-model="userInfo.state" :options="states" class="mb-3" size="lg" />
+                <b-form-select v-model="userInfo.state" :options="states" class="mb-3" />
               </div>
             </b-col>
             <b-col sm="12" md="4">
@@ -89,23 +96,9 @@ export default {
         { value: true, text: 'Admin' },
         { value: false, text: 'User' }
       ],
-      institutions: [],
-      departmentOptions: [],
-      states: [],
-      credentialOptions: [
-        { value: null, text: 'None' },
-        { value: 'MD', text: 'MD' },
-        { value: 'PhD', text: 'PhD' },
-        { value: 'MS', text: 'MS' },
-        { value: 'RN', text: 'RN' },
-        { value: 'PharmD', text: 'PharmD' },
-        { value: 'DDS', text: 'DDS' },
-        { value: 'DMD, ScD', text: 'DMD, ScD' },
-        { value: 'DVM, PhD', text: 'DVM, PhD' },
-        { value: 'D.Sc', text: 'D.Sc' },
-        { value: 'DO', text: 'DO' },
-        { value: 'Other', text: 'Other' }
-      ],
+      currentPage: 1,
+      perPage: 10,
+      pageOptions: [ 5, 10, 15 ],
       fields: {
         displayName: {
           label: 'User Name',
@@ -125,12 +118,14 @@ export default {
         }
       },
       users: [],
+      states: [],
       userInfo: []
     }
   },
   firestore () {
     return {
-      users: db.collection('metadata')
+      users: db.collection('metadata'),
+      states: db.collection('States').orderBy('id')
     }
   },
   methods: {
@@ -203,7 +198,7 @@ span{
   font-size: 11px;
 }
 .mb-3 {
-  height: 3.5rem!important;
+  height: 2.45rem!important;
   margin-bottom: 0px!important;
   margin-top: 10px;
 }

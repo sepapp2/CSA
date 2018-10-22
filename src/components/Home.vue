@@ -1,96 +1,55 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li>
-        <a
-          href="https://vuejs.org"
-          target="_blank"
+  <div class="home">
+<b-card-group deck>
+      <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in products" :key="idx" class="product-card">
+        <b-card :title="product.name"
+                :img-src= "product.productImage"
+                img-alt="Img"
+                img-top
+                img-fluid
         >
-          Core Docs
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://forum.vuejs.org"
-          target="_blank"
-        >
-          Forum
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://chat.vuejs.org"
-          target="_blank"
-        >
-          Community Chat
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://twitter.com/vuejs"
-          target="_blank"
-        >
-          Twitter
-        </a>
-      </li>
-      <br>
-      <li>
-        <a
-          href="http://vuejs-templates.github.io/webpack/"
-          target="_blank"
-        >
-          Docs for This Template
-        </a>
-      </li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li>
-        <a
-          href="http://router.vuejs.org/"
-          target="_blank"
-        >
-          vue-router
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vuex.vuejs.org/"
-          target="_blank"
-        >
-          vuex
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vue-loader.vuejs.org/"
-          target="_blank"
-        >
-          vue-loader
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-        >
-          awesome-vue
-        </a>
-      </li>
-    </ul>
+            <p class="card-text">
+                <div class="text-muted">
+                  Quantity Available: {{ product.quantity }}
+                </div>
+                <div class="text-muted">
+                  Price: ${{ product.price }}
+                </div>
+                <div>
+                {{ product.description }}
+                </div>
+            <div slot="footer">
+                <small class="text-muted">Last updated {{ product.modifiedDtm | moment("from", "now", true) }} ago</small>
+                <b-row>
+                  <b-col>
+                    <b-button @click="addToCart(product)" variant="outline-primary">Add to Cart</b-button>
+                  </b-col>
+                </b-row>
+            </div>
+        </b-card>
+      </b-col>
+    </b-card-group>
   </div>
 </template>
 
 <script>
+import { db } from '../main'
+import { mapActions } from 'vuex'
 export default {
-  name: 'Home',
+  name: 'app',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      products: []
     }
-  }
+  },
+  firestore () {
+    return {
+      products: db.collection('Products').orderBy('createdAt')
+    }
+  },
+  methods: mapActions([
+    'addToCart'
+  ])
 }
 </script>
 
@@ -109,5 +68,8 @@ li {
 }
 a {
   color: #42b983;
+}
+.home {
+  margin-top: 15px;
 }
 </style>

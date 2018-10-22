@@ -9,6 +9,8 @@ import 'firebase/firestore'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import Icon from 'vue-awesome/components/Icon'
+import 'vue-awesome/icons'
 import { config } from './config/firebaseConfig'
 import { store } from './store/store'
 
@@ -16,6 +18,7 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.use(require('vue-moment'))
 Vue.use(VueFire)
+Vue.component('icon', Icon)
 firebase.initializeApp(config)
 export const storage = firebase.storage()
 export const db = firebase.firestore()

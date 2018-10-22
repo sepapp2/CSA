@@ -111,9 +111,7 @@ export default {
   name: 'profile',
   firestore () {
     return {
-      // institutions: db.collection('Institutions').orderBy('id'),
-      // states: db.collection('States').orderBy('id'),
-      // departmentOptions: db.collection('Departments').orderBy('id'),
+      states: db.collection('States').orderBy('id'),
       userInfo: db.collection('metadata').doc(firebase.auth().currentUser.uid)
     }
   },
@@ -283,7 +281,7 @@ span{
   font-size: 11px;
 }
 .mb-3 {
-  height: 3.5rem!important;
+  height: 2.45rem!important;
   margin-bottom: 0px!important;
   margin-top: 10px;
 }

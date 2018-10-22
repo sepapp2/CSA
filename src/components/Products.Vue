@@ -1,6 +1,10 @@
 <template>
   <div class="products">
-    <b-btn variant="success" class="top-button" v-b-modal.modal1>Add New Product</b-btn>
+    <b-row align-h="center" class="text-center">
+      <b-col cols="12" sm="12" md="8">
+        <button type="submit" class="top-button" v-b-modal.modal1>Add New Product</button>
+      </b-col>
+    </b-row>
 
     <!-- Admin Cards -->
     <b-card-group deck>
@@ -14,8 +18,7 @@
                 <b-form-group id="productImageInputGroup"
                                 label="Replace Image"
                                 label-for="productImageInput">
-                    <b-form-file v-model="file" ref="fileinput" accept="image/*" :state="Boolean(file)" placeholder="Choose a file..." @change="detectFiles($event.target.files)"></b-form-file>
-                    <div class="progress-bar" :style="{ width: progressUpload + '%'}">{{ progressUpload }}%</div>
+                    <b-form-file v-model="file" ref="fileinput" accept="image/*" :state="Boolean(file)" placeholder="Choose a file..." @change="detectFileChange($event.target.files, product, idx)"></b-form-file>
                 </b-form-group>
                 <div class="text-muted text-left">
                   <b-form-group
@@ -23,7 +26,7 @@
                       label="Update the Name"
                       label-for="productName"
                   >
-                    <b-form-input id="productName" v-model="product.name" v-on:change="changeProduct(product, idx)"></b-form-input>
+                    <b-form-input id="productName" v-model="product.name"></b-form-input>
                   </b-form-group>
                   <b-form-group
                       id="productQtyGroup"
@@ -31,29 +34,32 @@
                       label="Update the quantity"
                       label-for="productQty"
                   >
-                    <b-form-input type="number" id="productQty" v-model="product.quantity" v-on:change="changeProduct(product, idx)"></b-form-input>
+                    <b-form-input type="number" id="productQty" v-model="product.quantity" ></b-form-input>
+                  </b-form-group>
+                  <b-form-group
+                      id="productPriceGroup"
+                      type="number"
+                      label="Update the price"
+                      label-for="productPrice"
+                  >
+                  <b-input-group prepend="$">
+                    <b-form-input type="number" step="0.01" id="productPrice" v-model="product.price" ></b-form-input>
+                  </b-input-group>
                   </b-form-group>
                   <b-form-group
                       id="productDescriptionGroup"
                       label="Update the Product Description"
                       label-for="productDescription"
                   >
-                    <textarea id="productDescription" class="form-control" v-model="product.description" v-on:change="changeProduct(product, idx)"></textarea>
-                  </b-form-group>
-                  <b-form-group
-                      id="productUrlGroup"
-                      type="url"
-                      label="Update the Url"
-                      label-for="productUrl"
-                  >
-                    <b-form-input type="url" id="productUrl" v-model="product.images" v-on:change="changeProduct(product, idx)"></b-form-input>
+                    <textarea id="productDescription" class="form-control" v-model="product.description" ></textarea>
                   </b-form-group>
                 </div>
             <div slot="footer">
                 <small class="text-muted">Last updated {{ product.modifiedDtm | moment("from", "now", true) }} ago</small>
                 <b-row>
                   <b-col>
-                    <b-button @click="deleteProduct(product.id)" variant="outline-primary">Remove Product</b-button>
+                    <b-button @click="changeProduct(product, idx)" variant="outline-primary">Update Product</b-button>
+                    <b-button @click="deleteProduct(product.id)" variant="outline-danger">Remove Product</b-button>
                   </b-col>
                 </b-row>
             </div>
@@ -97,6 +103,21 @@
                       placeholder="Enter Quantity of Product Available">
         </b-form-input>
       </b-form-group>
+        <b-form-group id="productPriceGroup"
+                    label="Enter Product Price:"
+                    label-for="productPrice"
+                    prepend="$"
+                    >
+        <b-input-group prepend="$">
+        <b-form-input id="productPrice"
+                      type="number"
+                      step="0.01"
+                      v-model="form.price"
+                      required
+                      placeholder="Enter Price of Product">
+        </b-form-input>
+        </b-input-group>
+      </b-form-group>
         <b-form-group id="productDescriptionGroup"
                     label="Product Description:"
                     label-for="productDescription">
@@ -118,7 +139,7 @@
 
 <script>
 import { db, storage } from '../main'
-import Firebase from 'firebase'
+import firebase from 'firebase'
 
 export default {
   name: 'Products',
@@ -165,10 +186,11 @@ export default {
           var updateDate = new Date()
           transaction.update(sfDocRef, {
             quantity: product.quantity,
+            price: product.price,
             modifiedDtm: updateDate,
             name: product.name,
             description: product.description,
-            images: product.images
+            productImage: product.productImage
           })
         })
       }).then(function () {
@@ -186,6 +208,7 @@ export default {
       this.form.modifiedDtm = new Date()
       db.collection('Products').add(this.form)
       this.form = {}
+      this.progressUpload = 0
       this.$refs.modal.hide()
     },
     onCancel () {
@@ -195,6 +218,7 @@ export default {
       evt.preventDefault()
       /* Reset our form values */
       this.form = {}
+      this.progressUpload = 0
       /* Trick to reset/clear native browser form validation state */
       this.show = false
       this.$nextTick(() => { this.show = true })
@@ -205,6 +229,11 @@ export default {
         this.upload(fileList[x])
       })
     },
+    detectFileChange (fileList, product, idx) {
+      Array.from(Array(fileList.length).keys()).map(x => {
+        this.uploadChange(fileList[x], product, idx)
+      })
+    },
     upload (file) {
       if (this.imageName != null) {
         var imageRef = storage.ref().child('images/' + this.imageName)
@@ -213,12 +242,94 @@ export default {
           throw new Error('Error removing file: ' + error)
         })
       }
-      this.uploadTask = storage.ref('images/' + file.name).put(file)
-      this.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-        this.$emit('url', downloadURL)
-        console.log(downloadURL)
-        this.form.productImage = downloadURL
-      })
+      var uploadTask = storage.ref('images/' + file.name).put(file)
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+        snapshot => {
+          this.progressUpload = Math.floor(snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED:
+              console.log('Upload is paused')
+              break
+            case firebase.storage.TaskState.RUNNING:
+              console.log('Upload is running')
+              break
+          }
+        }, error => {
+          switch (error.code) {
+            case 'storage/unauthorized':
+              alert('Error Uploading File')
+              break
+
+            case 'storage/canceled':
+              alert('File Upload Cancelled')
+              break
+
+            case 'storage/unknown':
+              alert('Error Uploading File')
+              break
+          }
+        }, completed => {
+          // Upload completed successfully, now we can get the download URL
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            this.form.productImage = downloadURL
+          })
+        })
+    },
+    uploadChange (file, product, idx) {
+      if (this.imageName != null) {
+        var imageRef = storage.ref().child('images/' + this.imageName)
+        imageRef.delete().then(function () {
+        }).catch(function (error) {
+          throw new Error('Error removing file: ' + error)
+        })
+      }
+      var uploadTask = storage.ref('images/' + file.name).put(file)
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+        snapshot => {
+          this.progressUpload = Math.floor(snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED:
+              console.log('Upload is paused')
+              break
+            case firebase.storage.TaskState.RUNNING:
+              console.log('Upload is running')
+              break
+          }
+        }, error => {
+          switch (error.code) {
+            case 'storage/unauthorized':
+              alert('Error Uploading File')
+              break
+
+            case 'storage/canceled':
+              alert('File Upload Cancelled')
+              break
+
+            case 'storage/unknown':
+              alert('Error Uploading File')
+              break
+          }
+        }, completed => {
+          // Upload completed successfully, now we can get the download URL
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            var sfDocRef = db.collection('Products').doc(product.id)
+            return db.runTransaction(function (transaction) {
+            // This code may get re-run multiple times if there are conflicts.
+              return transaction.get(sfDocRef).then(function (sfDoc) {
+                if (!sfDoc.exists) {
+                  throw new Error('Document does not exist!')
+                }
+                transaction.update(sfDocRef, {
+                  productImage: downloadURL
+                })
+              })
+            }).then(function () {
+              console.log('Transaction successfully committed!')
+            }).catch(function (error) {
+              console.log('Transaction failed: ', error)
+            })
+          })
+        })
     }
   },
   watch: {
@@ -259,6 +370,14 @@ a {
 }
 .top-button, .product-card {
   margin-bottom: 15px;
+}
+.top-button {
+  width: 60%;
+  margin-top: 20px;
+  cursor: pointer;
+  padding: 10px;
+  background-color: rgb(33,150,243);
+  color: rgb(255,255,255);
 }
 .icon-set {
   display: flex;
