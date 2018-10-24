@@ -53,6 +53,11 @@
                   >
                     <textarea id="productDescription" class="form-control" v-model="product.description" ></textarea>
                   </b-form-group>
+                    <b-form-group>
+                      <b-form-checkbox v-model="product.active">
+                        Product is Active
+                      </b-form-checkbox>
+                    </b-form-group>
                 </div>
             <div slot="footer">
                 <small class="text-muted">Last updated {{ product.modifiedDtm | moment("from", "now", true) }} ago</small>
@@ -87,9 +92,9 @@
                       placeholder="Enter Product Name">
         </b-form-input>
       </b-form-group>
-      <b-form-group id="conferenceLogoInputGroup"
+      <b-form-group id="productLogoInputGroup"
                     label="Logo"
-                    label-for="conferenceLogoInput">
+                    label-for="productLogoInput">
           <b-form-file v-model="file" ref="fileinput" accept="image/*" :state="Boolean(file)" placeholder="Choose a file..." @change="detectFiles($event.target.files)"></b-form-file>
           <div class="progress-bar" :style="{ width: progressUpload + '%'}">{{ progressUpload }}%</div>
       </b-form-group>
@@ -128,6 +133,11 @@
                       placeholder="Enter a brief product description">
         </b-form-textarea>
       </b-form-group>
+        <b-form-group>
+          <b-form-checkbox v-model="form.active">
+            Product is Active
+          </b-form-checkbox>
+        </b-form-group>
       <div slot="modal-footer">
           <b-button type="reset" variant="secondary">Cancel</b-button>
           <b-button type="cancel" variant="primary">Submit</b-button>
@@ -158,7 +168,8 @@ export default {
         images: '',
         description: '',
         quantity: '',
-        productImage: ''
+        productImage: '',
+        active: true
       },
       progressUpload: 0,
       file: File,
@@ -170,7 +181,7 @@ export default {
   },
   firestore () {
     return {
-      products: db.collection('Products').orderBy('createdAt')
+      products: db.collection('Products').orderBy('name', 'asc')
     }
   },
   methods: {
@@ -190,7 +201,8 @@ export default {
             modifiedDtm: updateDate,
             name: product.name,
             description: product.description,
-            productImage: product.productImage
+            productImage: product.productImage,
+            active: product.active
           })
         })
       }).then(function () {

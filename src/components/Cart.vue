@@ -20,20 +20,32 @@
     <template slot="total" slot-scope="data">
       ${{data.item.quantity * data.item.price | round(2)}}
     </template>
+    <template slot="removeItem" slot-scope="data">
+      <b-button variant="outline-danger" @click="removeFromCart(data.item)">Remove Item</b-button>
+    </template>
   </b-table>
-    <p><button v-show="products.length" class='button is-primary' @click='checkout'>Checkout</button></p> -->
-  ${{ total | round(2)}}
-  </div>
+  <b-row>
+      <b-col cols="12" align-h="right" class="text-right">
+            <h3> Total: ${{ total | round(2)}}</h3>
+      </b-col>
+  </b-row>
+  <b-row>
+      <b-col cols="12" align-h="right" class="text-right">
+          <b-button variant="outline-success" size="lg" @click="checkout()">Place Order</b-button>
+      </b-col>
+  </b-row>
+</div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { db } from '../main'
 export default {
   name: 'Cart',
   filters: {
-    round(value, accuracy, keep) {
-        if (typeof value !== 'number') return value;
-        var fixed = value.toFixed(accuracy);
-        return keep ? fixed : +fixed; 
+    round (value, accuracy, keep) {
+      if (typeof value !== 'number') return value
+      var fixed = value.toFixed(accuracy)
+      return keep ? fixed : +fixed
     }
   },
   data () {
@@ -42,11 +54,15 @@ export default {
         { key: 'name', label: 'Product Name' },
         { key: 'description', label: 'Product Description' },
         { key: 'quantity', label: 'Quantity' },
-        { key: 'total', label: 'Total' }
+        { key: 'total', label: 'Total' },
+        { key: 'removeItem', label: 'Actions' }
       ]
     }
   },
   computed: {
+    userProfile () {
+      return this.$store.getters.getUserProfile
+    },
     ...mapGetters({
       products: 'cartProducts',
       all: 'allProducts'
@@ -59,8 +75,21 @@ export default {
   },
   methods: {
     checkout () {
-      alert('Pay us $' + this.total)
-    }
+      db.collection('orders').add({
+        user: this.userProfile,
+        order: this.products
+      })
+        .then(function (docRef) {
+          alert('Order Placed')
+        })
+        .catch(function (error) {
+          alert('Error placing order, please try again')
+          console.log(error)
+        })
+    },
+    ...mapActions([
+      'removeFromCart'
+    ])
   }
 }
 </script>

@@ -44,7 +44,7 @@ export default {
   },
   firestore () {
     return {
-      products: db.collection('Products').orderBy('createdAt')
+      products: db.collection('Products').where('active', '==', true).orderBy('name', 'asc')
     }
   },
   methods: mapActions([

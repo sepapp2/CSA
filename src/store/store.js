@@ -19,7 +19,6 @@ export const store = new Vuex.Store({
     getUserProfile: state => {
       return state.userProfile
     },
-
     cartProducts: state => {
       return state.added
     }
@@ -31,9 +30,17 @@ export const store = new Vuex.Store({
     addToCart ({ commit }, product) {
       commit(types.ADD_TO_CART, product
       )
+    },
+    removeFromCart ({ commit }, product) {
+      commit(types.REMOVE_FROM_CART, product
+      )
     }
   },
   mutations: {
+    REMOVE_FROM_CART (state, id) {
+      const index = state.added.findIndex(p => p.id === id.id)
+      state.added.splice(index, 1)
+    },
     ADD_TO_CART (state, id) {
       const record = state.added.find(p => p.id === id.id)
       if (!record) {
