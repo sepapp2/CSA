@@ -1,7 +1,19 @@
 <template>
   <div class="users">
-    <b-container fluid>
-      <!-- User Interface controls -->
+    <h2>Users</h2>
+  <b-container fluid>
+  <b-row align-h="center">
+        <b-col cols="4" class="my-1">
+          <b-form-group horizontal label="Filter" class="mb-0">
+            <b-input-group>
+              <b-form-input v-model="filter" placeholder="Type to Search" />
+              <b-input-group-append>
+                <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-row>
         <b-col md="6" offset-md="3">
           <b-table striped
@@ -9,7 +21,9 @@
                    :items="users"
                    :fields="fields"
                    :current-page="currentPage"
+                   :filter="filter"
                    :per-page="perPage"
+                   stacked="md"
           >
           <template slot="admin" v-if="userProfile.admin" slot-scope="item">
             <b-form-select v-model="item.item.admin" :options="adminOptions" class="mb-3 select-table-row" @change="changeRole(item.item)"/>
@@ -22,8 +36,8 @@
           </b-table>
         </b-col>
       </b-row>
-      <b-row>
-        <b-col md="6" offset-md="3" class="my-1">
+      <b-row align-h="center">
+        <b-col cols="2">
             <b-pagination :total-rows="users.length" :per-page="perPage" v-model="currentPage" class="my-0" />
         </b-col>
       </b-row>
@@ -98,7 +112,6 @@ export default {
       ],
       currentPage: 1,
       perPage: 10,
-      pageOptions: [ 5, 10, 15 ],
       fields: {
         displayName: {
           label: 'User Name',
@@ -119,7 +132,8 @@ export default {
       },
       users: [],
       states: [],
-      userInfo: []
+      userInfo: [],
+      filter: null
     }
   },
   firestore () {
@@ -179,16 +193,17 @@ export default {
           console.log('Transaction failed: ', error)
         })
       }
+    },
+    onFiltered (filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length
+      this.currentPage = 1
     }
   }
 }
 </script>
 
 <style scoped>
-input {
-  margin: 10px 0;
-  padding: 15px;
-}
 .form-control {
   border-radius: 0px;
 }

@@ -36,6 +36,11 @@
                   >
                     <b-form-input type="number" id="productQty" v-model="product.quantity" ></b-form-input>
                   </b-form-group>
+                  <b-form-group id="productQuantityLabelGroup"
+                                label="Enter Quantity Label:"
+                                label-for="productQuantityLabel">
+                    <b-form-select id="productQuantityLabel" v-model="product.quantityLabel" :options="options" class="mb-3"/>
+                  </b-form-group>
                   <b-form-group
                       id="productPriceGroup"
                       type="number"
@@ -108,6 +113,11 @@
                       placeholder="Enter Quantity of Product Available">
         </b-form-input>
       </b-form-group>
+      <b-form-group id="productQuantityLabelGroup"
+                    label="Enter Quantity Label:"
+                    label-for="productQuantityLabel">
+      <b-form-select id="productQuantityLabel" v-model="form.quantityLabel" :options="options" class="mb-3"/>
+      </b-form-group>
         <b-form-group id="productPriceGroup"
                     label="Enter Product Price:"
                     label-for="productPrice"
@@ -163,11 +173,18 @@ export default {
   },
   data () {
     return {
+      options: [
+        { value: null, text: 'Please select an option' },
+        { value: 'Lbs', text: 'Lbs' },
+        { value: 'Bunch', text: 'Bunch' },
+        { value: 'Each', text: 'Each' }
+      ],
       form: {
         name: '',
         images: '',
         description: '',
         quantity: '',
+        quantityLabel: null,
         productImage: '',
         active: true
       },
@@ -197,12 +214,14 @@ export default {
           var updateDate = new Date()
           transaction.update(sfDocRef, {
             quantity: product.quantity,
+            quantityLabel: product.quantityLabel,
             price: product.price,
             modifiedDtm: updateDate,
             name: product.name,
             description: product.description,
             productImage: product.productImage,
-            active: product.active
+            active: product.active,
+            quantityAdd: 1
           })
         })
       }).then(function () {

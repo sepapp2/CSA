@@ -34,12 +34,19 @@ export const store = new Vuex.Store({
     removeFromCart ({ commit }, product) {
       commit(types.REMOVE_FROM_CART, product
       )
+    },
+    clearCart ({ commit }, product) {
+      commit(types.CLEAR_CART, product
+      )
     }
   },
   mutations: {
     REMOVE_FROM_CART (state, id) {
       const index = state.added.findIndex(p => p.id === id.id)
       state.added.splice(index, 1)
+    },
+    CLEAR_CART (state, id) {
+      state.added = []
     },
     ADD_TO_CART (state, id) {
       const record = state.added.find(p => p.id === id.id)
@@ -49,7 +56,8 @@ export const store = new Vuex.Store({
           name: id.name,
           price: id.price,
           description: id.description,
-          quantity: 1
+          quantityLabel: id.quantityLabel,
+          quantity: id.quantityAdd
         })
       } else {
         record.quantity++

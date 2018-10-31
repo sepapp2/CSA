@@ -12,6 +12,9 @@
             <b-nav-item to="/products" v-if="userProfile.admin">MANAGE PRODUCTS</b-nav-item>
           </b-navbar-nav>
           <b-navbar-nav>
+            <b-nav-item to="/orders" v-if="userProfile.admin">ORDERS</b-nav-item>
+          </b-navbar-nav>
+          <b-navbar-nav>
             <b-nav-item to="/users" v-if="userProfile.admin">USERS</b-nav-item>
           </b-navbar-nav>
 
@@ -25,6 +28,7 @@
               <!-- Using button-content slot -->
 
               <b-dropdown-item to="/profile">Profile</b-dropdown-item>
+              <b-dropdown-item to="/myOrders">My Orders</b-dropdown-item>
               <b-dropdown-item v-on:click="logout">Sign out</b-dropdown-item>
             </b-nav-item-dropdown>
           </b-navbar-nav>

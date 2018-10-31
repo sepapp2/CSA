@@ -13,16 +13,21 @@
                   Quantity Available: {{ product.quantity }}
                 </div>
                 <div class="text-muted">
-                  Price: ${{ product.price }}
+                  Price: ${{ product.price }}/{{product.quantityLabel}}
                 </div>
                 <div>
                 {{ product.description }}
                 </div>
             <div slot="footer">
                 <small class="text-muted">Last updated {{ product.modifiedDtm | moment("from", "now", true) }} ago</small>
-                <b-row>
-                  <b-col>
-                    <b-button @click="addToCart(product)" variant="outline-primary">Add to Cart</b-button>
+                <b-row align-h="center" class="text-center">
+                  <b-col cols="6">
+                    <b-input-group>
+                      <b-form-input type="number" v-model="product.quantityAdd"></b-form-input>
+                      <b-input-group-append>
+                        <b-button @click="addToCart(product)" variant="outline-primary">Add to Cart</b-button>
+                      </b-input-group-append>
+                    </b-input-group>
                   </b-col>
                 </b-row>
             </div>

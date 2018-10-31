@@ -17,6 +17,9 @@
       </b-form-input>
     </template>
     <!-- A virtual composite column -->
+    <template slot="pricePerQuantity" slot-scope="data">
+      ${{data.item.price | round(2)}}/{{data.item.quantityLabel}}
+    </template>
     <template slot="total" slot-scope="data">
       ${{data.item.quantity * data.item.price | round(2)}}
     </template>
@@ -54,12 +57,16 @@ export default {
         { key: 'name', label: 'Product Name' },
         { key: 'description', label: 'Product Description' },
         { key: 'quantity', label: 'Quantity' },
+        { key: 'pricePerQuantity', label: 'Price' },
         { key: 'total', label: 'Total' },
         { key: 'removeItem', label: 'Actions' }
       ]
     }
   },
   computed: {
+    user () {
+      return this.$store.getters.getUser
+    },
     userProfile () {
       return this.$store.getters.getUserProfile
     },
@@ -76,11 +83,17 @@ export default {
   methods: {
     checkout () {
       db.collection('orders').add({
-        user: this.userProfile,
-        order: this.products
+        uid: this.user.uid,
+        userOrdering: this.userProfile,
+        order: this.products,
+        orderTotal: this.total,
+        orderDate: new Date(),
+        isFilled: false,
+        userName: this.userProfile.displayName
       })
-        .then(function (docRef) {
+        .then(docRef => {
           alert('Order Placed')
+          this.$store.dispatch('clearCart')
         })
         .catch(function (error) {
           alert('Error placing order, please try again')

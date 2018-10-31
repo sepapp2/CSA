@@ -7,6 +7,8 @@ import Profile from '@/components/Profile'
 import Products from '@/components/Products'
 import Users from '@/components/Users'
 import Cart from '@/components/Cart'
+import MyOrders from '@/components/MyOrders'
+import Orders from '@/components/Orders'
 import firebase from 'firebase'
 import { db } from '../main'
 
@@ -49,6 +51,14 @@ let router = new Router({
       }
     },
     {
+      path: '/myOrders',
+      name: 'MyOrders',
+      component: MyOrders,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
       path: '/products',
       name: 'Products',
       component: Products,
@@ -61,6 +71,15 @@ let router = new Router({
       path: '/users',
       name: 'Users',
       component: Users,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      }
+    },
+    {
+      path: '/orders',
+      name: 'Orders',
+      component: Orders,
       meta: {
         requiresAuth: true,
         requiresAdmin: true
