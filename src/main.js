@@ -9,6 +9,7 @@ import 'firebase/firestore'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import JsonExcel from 'vue-json-excel'
 import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons'
 import { config } from './config/firebaseConfig'
@@ -18,6 +19,7 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.use(require('vue-moment'))
 Vue.use(VueFire)
+Vue.component('downloadExcel', JsonExcel)
 Vue.component('icon', Icon)
 firebase.initializeApp(config)
 export const storage = firebase.storage()

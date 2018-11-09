@@ -82,6 +82,9 @@ export default {
   },
   methods: {
     checkout () {
+      if (this.products.filter(order => order.quantityLabel === 'Share').length > 0) {
+        alert('Fill in More information here')
+      }
       db.collection('orders').add({
         uid: this.user.uid,
         userOrdering: this.userProfile,
@@ -92,6 +95,22 @@ export default {
         userName: this.userProfile.displayName
       })
         .then(docRef => {
+          this.products.forEach(item => {
+            var orderDocRef = db.collection('Products').doc(item.id)
+            return db.runTransaction(transaction => {
+              return transaction.get(orderDocRef).then(orderDoc => {
+                if (!orderDoc.exists) {
+                  console.log('Document does not exist!')
+                }
+                var newQty = parseInt(orderDoc.data().quantity) - item.quantity
+                transaction.update(orderDocRef, { quantity: newQty })
+              })
+            }).then(function () {
+              console.log('Transaction successfully committed!')
+            }).catch(function (error) {
+              console.log('Transaction failed: ', error)
+            })
+          })
           alert('Order Placed')
           this.$store.dispatch('clearCart')
         })

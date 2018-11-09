@@ -40,12 +40,25 @@
         </b-button>
       </template>
     </b-table>
-
     <b-row align-h="center">
       <b-col cols="2">
-        <b-pagination :total-rows="filledOrders.length" :per-page="perPage" v-model="currentPage" class="my-0" />
+        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
       </b-col>
     </b-row>
+    <!-- <b-row>
+      <b-col md="2" offset-md="6">
+          <div class='link'>
+              <download-excel
+                      class = "btn btn-info m-2"
+:data   = "json_data"
+    :fields = "json_fields"
+    name    = "filename.xls"
+                      >
+                      Download Data
+              </download-excel>
+          </div>
+      </b-col>
+    </b-row> -->
     <!-- Info modal -->
     <b-modal id="modalInfo"
              @hide="resetModal"
@@ -53,8 +66,17 @@
              size="lg"
              ok-title="Mark Filled"
              @ok="markOrderFilled(modelInfo.content)">
-
-      <pre>{{ modalInfo.content.isFilled }}</pre>
+            <b-card title="Contact Information">
+                <p class="card-text" v-if="modalInfo.content">
+                    Email: {{modalInfo.content.userOrdering.email}}<br>
+                    Phone: {{modalInfo.content.userOrdering.phone}}
+                </p>
+            <b-list-group>
+              <b-list-group-item v-for="(item, ids) in modalInfo.content.order" :key="ids">{{item.name}}
+                <b-badge variant="primary" pill>{{item.quantity}}</b-badge>
+              </b-list-group-item>
+            </b-list-group>
+            </b-card>
     </b-modal>
     </div>
 </template>
@@ -75,6 +97,11 @@ export default {
       return this.orders.filter(order => {
         return order.isFilled === this.filledStatus
       })
+    },
+    totalRows () {
+      return this.orders.filter(order => {
+        return order.isFilled === this.filledStatus
+      }).length
     }
   },
   data () {

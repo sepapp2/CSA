@@ -177,7 +177,8 @@ export default {
         { value: null, text: 'Please select an option' },
         { value: 'Lbs', text: 'Lbs' },
         { value: 'Bunch', text: 'Bunch' },
-        { value: 'Each', text: 'Each' }
+        { value: 'Each', text: 'Each' },
+        { value: 'Share', text: 'Share' }
       ],
       form: {
         name: '',
@@ -186,7 +187,8 @@ export default {
         quantity: '',
         quantityLabel: null,
         productImage: '',
-        active: true
+        active: true,
+        quantityAdd: 1
       },
       progressUpload: 0,
       file: File,

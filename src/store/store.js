@@ -57,7 +57,8 @@ export const store = new Vuex.Store({
           price: id.price,
           description: id.description,
           quantityLabel: id.quantityLabel,
-          quantity: id.quantityAdd
+          quantity: id.quantityAdd,
+          userName: state.userProfile.displayName
         })
       } else {
         record.quantity++
