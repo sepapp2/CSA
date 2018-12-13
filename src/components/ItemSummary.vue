@@ -17,7 +17,7 @@
           <div class="card-body">
             <h5 class="card-title"><icon  name="info"></icon>&nbsp;Item Totals</h5>
             <b-list-group>
-              <b-list-group-item v-for="item in itemsTotal" class="d-flex justify-content-between align-items-center">
+              <b-list-group-item v-for="(item, idx) in itemsTotal" :key="idx" class="d-flex justify-content-between align-items-center">
                 {{item.itemName}}
                 <b-badge variant="primary" pill>{{item.itemQuantity}}</b-badge>
               </b-list-group-item>
