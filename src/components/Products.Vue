@@ -41,6 +41,25 @@
                                 label-for="productQuantityLabel">
                     <b-form-select id="productQuantityLabel" v-model="product.quantityLabel" :options="options" class="mb-3"/>
                   </b-form-group>
+                    <b-form-group>
+                      <b-form-checkbox v-model="product.displayQuantity">
+                        Display Available Quantity to Users
+                      </b-form-checkbox>
+                    </b-form-group>
+                    <b-form-group>
+                      <b-form-checkbox v-model="product.limitQuantityAllowed" @change="product.limitQuantity = ''">
+                        Do you want to limit the Quantity allowed in cart
+                      </b-form-checkbox>
+                    </b-form-group>
+                    <b-form-group
+                      id="productQtyLimitGroup"
+                      type="number"
+                      label="Update the quantity limit"
+                      label-for="productQtyLimit"
+                      v-if="product.limitQuantityAllowed"
+                  >
+                    <b-form-input type="number" id="productQtyLimit" v-model="product.limitQuantity" ></b-form-input>
+                  </b-form-group>
                   <b-form-group
                       id="productPriceGroup"
                       type="number"
@@ -118,6 +137,26 @@
                     label-for="productQuantityLabel">
       <b-form-select id="productQuantityLabel" v-model="form.quantityLabel" :options="options" class="mb-3"/>
       </b-form-group>
+        <b-form-group>
+          <b-form-checkbox v-model="form.displayQuantity">
+            Display Available Quantity to Users
+          </b-form-checkbox>
+        </b-form-group>
+        <b-form-group>
+          <b-form-checkbox v-model="form.limitQuantityAllowed">
+            Do you want to limit the Quantity allowed in cart
+          </b-form-checkbox>
+        </b-form-group>
+        <b-form-group v-if="form.limitQuantityAllowed" id="productQuantityLimitGroup"
+                    label="Enter Maximum Quantity:"
+                    label-for="productQuantityLimit">
+        <b-form-input id="productQuantityLimit"
+                      type="number"
+                      v-model="form.limitQuantity"
+                      required
+                      placeholder="Enter Maximum Quantity for Users">
+        </b-form-input>
+      </b-form-group>
         <b-form-group id="productPriceGroup"
                     label="Enter Product Price:"
                     label-for="productPrice"
@@ -188,6 +227,9 @@ export default {
         quantityLabel: null,
         productImage: '',
         active: true,
+        displayQuantity: true,
+        limitQuantityAllowed: false,
+        limitQuantity: '',
         quantityAdd: 1
       },
       progressUpload: 0,
@@ -217,6 +259,9 @@ export default {
           transaction.update(sfDocRef, {
             quantity: product.quantity,
             quantityLabel: product.quantityLabel,
+            displayQuantity: product.displayQuantity,
+            limitQuantityAllowed: product.limitQuantityAllowed,
+            limitQuantity: product.limitQuantity,
             price: product.price,
             modifiedDtm: updateDate,
             name: product.name,

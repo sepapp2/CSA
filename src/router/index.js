@@ -9,6 +9,8 @@ import Users from '@/components/Users'
 import Cart from '@/components/Cart'
 import MyOrders from '@/components/MyOrders'
 import Orders from '@/components/Orders'
+import ItemSummary from '@/components/ItemSummary'
+import AboutUs from '@/components/AboutUs'
 import firebase from 'firebase'
 import { db } from '../main'
 
@@ -86,12 +88,26 @@ let router = new Router({
       }
     },
     {
+      path: '/itemSummary',
+      name: 'ItemSummary',
+      component: ItemSummary,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      }
+    },
+    {
       path: '/cart',
       name: 'Cart',
       component: Cart,
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/aboutUs',
+      name: 'AboutUs',
+      component: AboutUs
     }
   ]
 })

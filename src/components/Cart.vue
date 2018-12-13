@@ -13,6 +13,7 @@
     <template slot="quantity" slot-scope="data">
       <b-form-input v-model="data.item.quantity"
                     type="number"
+                    v-bind:max="data.item.quantityLimit"
                     >
       </b-form-input>
     </template>
@@ -32,11 +33,81 @@
             <h3> Total: ${{ total | round(2)}}</h3>
       </b-col>
   </b-row>
-  <b-row>
+  <b-row v-show="products.length">
       <b-col cols="12" align-h="right" class="text-right">
           <b-button variant="outline-success" size="lg" @click="checkout()">Place Order</b-button>
       </b-col>
   </b-row>
+    <b-modal  id="modal1"
+              size="lg"
+              ref="myModalRef"
+              title="Update Pickup Information"
+              ok-title="Submit"
+              @ok="checkout">
+    <b-form class="modal-form">
+    <b-form-group label="Pickup Location">
+      <b-form-radio-group id="radiosPickup" v-model="form.pickupLocation" name="radioPickup" required>
+        <b-form-radio value="Farm">Farm</b-form-radio>
+        <b-form-radio value="Campus">Campus</b-form-radio>
+      </b-form-radio-group>
+    </b-form-group>
+    <b-form-group label="University Affiliation">
+      <b-form-radio-group id="radiosAffiliation" v-model="form.affiliation" name="radioAffiliation" required>
+        <b-form-radio value="Staff">Staff</b-form-radio>
+        <b-form-radio value="Faculty">Faculty</b-form-radio>
+        <b-form-radio value="Student">Student</b-form-radio>
+      </b-form-radio-group>
+    </b-form-group>
+    <b-form-group label="Text Reminders">
+      <b-form-radio-group id="radiosTexts" v-model="form.texts" name="radioTexts">
+        <b-form-radio value="Yes">Yes</b-form-radio>
+        <b-form-radio value="No">No</b-form-radio>
+      </b-form-radio-group>
+    </b-form-group>
+    <b-form-group v-if="form.texts==='Yes'">
+      <label for="cellPhone">Cell Number:</label>
+      <b-form-input v-model="form.cellPhone"
+                  type="text"
+                  placeholder="Enter Cell Phone Number"></b-form-input>
+    </b-form-group>
+    <b-form-group v-if="form.texts==='Yes'">
+      <label for="cellCarrier">Cell Carrier:</label>
+      <b-form-input v-model="form.cellCarrier"
+                  type="text"
+                  placeholder="Enter Cell Carrier"></b-form-input>
+    </b-form-group>
+    <b-form-group>
+      <label for="partnerFirstName">Partner First Name:</label>
+      <b-form-input v-model="form.partnerFirstName"
+                  type="text"
+                  placeholder="Enter Partner's First Name"></b-form-input>
+    </b-form-group>
+    <b-form-group>
+      <label for="partnerLastName">Partner Last Name:</label>
+      <b-form-input v-model="form.partnerLastName"
+                  type="text"
+                  placeholder="Enter Partner's Last Name"></b-form-input>
+    </b-form-group>
+    <b-form-group>
+      <label for="partnerEmail">Partner Email:</label>
+      <b-form-input v-model="form.partnerEmail"
+                  type="text"
+                  placeholder="Enter Partner's Email Address"></b-form-input>
+    </b-form-group>
+    <b-form-group label="Payment Method">
+      <b-form-radio-group id="radiosPaymentMethod" v-model="form.paymentMethod" name="radioPaymentMethod">
+        <b-form-radio value="Credit Card">Credit Card</b-form-radio>
+        <b-form-radio value="Mail in Check">Mail in Check</b-form-radio>
+      </b-form-radio-group>
+    </b-form-group>
+    <b-form-group label="Payment Plan">
+      <b-form-radio-group id="radiosPaymentPlan" v-model="form.paymentPlan" name="radioPaymentPlan">
+        <b-form-radio value="Full">In Full at Sign Up</b-form-radio>
+        <b-form-radio value="Installments">In 3 Installments with minumum deposit due at sign up</b-form-radio>
+      </b-form-radio-group>
+    </b-form-group>
+    </b-form>
+  </b-modal>
 </div>
 </template>
 <script>
@@ -60,10 +131,29 @@ export default {
         { key: 'pricePerQuantity', label: 'Price' },
         { key: 'total', label: 'Total' },
         { key: 'removeItem', label: 'Actions' }
-      ]
+      ],
+      form: {
+        pickupLocation: null,
+        affiliation: null,
+        texts: null,
+        partnerFirstName: null,
+        partnerLastName: null,
+        partnerEmail: null,
+        paymentMethod: null,
+        paymentPlan: null,
+        cellPhone: null,
+        cellCarrier: null
+      }
     }
   },
   computed: {
+    formValid () {
+      if (this.form.pickupLocation && this.form.affiliation && this.form.texts) {
+        return true
+      } else {
+        return false
+      }
+    },
     user () {
       return this.$store.getters.getUser
     },
@@ -82,8 +172,9 @@ export default {
   },
   methods: {
     checkout () {
-      if (this.products.filter(order => order.quantityLabel === 'Share').length > 0) {
-        alert('Fill in More information here')
+      if (this.products.filter(order => order.quantityLabel === 'Share').length > 0 && this.formValid === false) {
+        this.$refs.myModalRef.show()
+        return
       }
       db.collection('orders').add({
         uid: this.user.uid,
@@ -92,7 +183,17 @@ export default {
         orderTotal: this.total,
         orderDate: new Date(),
         isFilled: false,
-        userName: this.userProfile.displayName
+        userName: this.userProfile.displayName,
+        pickupLocation: this.form.pickupLocation,
+        affiliation: this.form.affiliation,
+        textReminders: this.form.texts,
+        partnerFirstName: this.form.partnerFirstName,
+        partnerLastName: this.form.partnerLastName,
+        partnerEmail: this.form.partnerEmail,
+        paymentMethod: this.form.paymentMethod,
+        paymentPlan: this.form.paymentPlan,
+        cellPhone: this.form.cellPhone,
+        cellCarrier: this.form.cellCarrier
       })
         .then(docRef => {
           this.products.forEach(item => {
@@ -129,7 +230,7 @@ export default {
 .cart {
   margin-top: 15px;
 }
-input {
-  text-align:right!important;
+.modal-form {
+  text-align: left!important;
 }
 </style>

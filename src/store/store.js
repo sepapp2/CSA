@@ -58,8 +58,12 @@ export const store = new Vuex.Store({
           description: id.description,
           quantityLabel: id.quantityLabel,
           quantity: id.quantityAdd,
+          quantityLimit: id.limitQuantity,
           userName: state.userProfile.displayName
         })
+        alert('Item added to cart.  To Checkout, please select the Checkout button at the top of the page')
+      } else if (parseInt(record.quantity) >= id.limitQuantity) {
+        alert('The maximum quantity allowed for this item is ' + id.limitQuantity)
       } else {
         record.quantity++
       }

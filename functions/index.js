@@ -49,7 +49,7 @@ exports.newOrder = functions.firestore
         
           // The user unsubscribed to the newsletter.
           mailOptions.subject = `Your UKCSA Order Has Been Placed`;
-            mailOptions.html = newValue.order;
+            mailOptions.html = `Please visit the website to view ordering history.</br><a href="https://uk-csa.firebaseapp.com/#/myOrders">UKCSA</a>`;
             return mailTransport.sendMail(mailOptions).then(() => {
             return console.log('Order Confirmation email sent to:', email);
           });     

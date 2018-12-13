@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-navbar toggleable="md" type="dark" class="bg-navbar">
+    <b-navbar toggleable="md" type="light" class="bg-navbar">
 
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
         <b-navbar-brand to="/home">
@@ -12,18 +12,21 @@
             <b-nav-item to="/products" v-if="userProfile.admin">MANAGE PRODUCTS</b-nav-item>
           </b-navbar-nav>
           <b-navbar-nav>
-            <b-nav-item to="/orders" v-if="userProfile.admin">ORDERS</b-nav-item>
+            <b-nav-item-dropdown right text="REPORTS" id="report-menu-dropdown" v-if="userProfile.admin">
+              <b-dropdown-item to="/orders" v-if="userProfile.admin">Orders</b-dropdown-item>
+              <b-dropdown-item to="/itemSummary" v-if="userProfile.admin">Item Summary</b-dropdown-item>
+            </b-nav-item-dropdown>
           </b-navbar-nav>
           <b-navbar-nav>
             <b-nav-item to="/users" v-if="userProfile.admin">USERS</b-nav-item>
+          </b-navbar-nav>
+          <b-navbar-nav>
+            <b-nav-item to="/aboutUs" v-if="!userProfile.admin">ABOUT US</b-nav-item>
           </b-navbar-nav>
 
           <!-- Right aligned nav items -->
           <b-navbar-nav class="ml-auto">
             <b-nav-item v-if="!user" to="/login">Login</b-nav-item>
-            <b-nav-item v-if="user">
-              <b-button variant="primary" to="/cart"><icon name="shopping-cart"></icon> Checkout ({{itemsInCart}})</b-button>
-            </b-nav-item>
             <b-nav-item-dropdown right :text=user.displayName id="right-menu-dropdown" v-if="user">
               <!-- Using button-content slot -->
 
@@ -31,6 +34,9 @@
               <b-dropdown-item to="/myOrders">My Orders</b-dropdown-item>
               <b-dropdown-item v-on:click="logout">Sign out</b-dropdown-item>
             </b-nav-item-dropdown>
+            <b-nav-item v-if="user">
+              <b-button variant="primary" to="/cart"><icon name="shopping-cart"></icon> Checkout ({{itemsInCart}})</b-button>
+            </b-nav-item>
           </b-navbar-nav>
 
         </b-collapse>
@@ -88,14 +94,14 @@ export default {
   border: 0 none;
   box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
 }
-.navbar-dark .navbar-nav .nav-link {
+.navbar-light .navbar-nav .nav-link {
   color: #ffb81c!important;
   font-size: 1.25rem;
 }
-.navbar-dark .navbar-nav .nav-link:hover {
+.navbar-light .navbar-nav .nav-link:hover {
   color: #da9500!important;
 }
-.navbar-dark .navbar-nav .nav-link.active {
+.navbar-light .navbar-nav .nav-link.active {
   color: #0033A0!important;
 }
 .navbar-brand {
