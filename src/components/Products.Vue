@@ -5,10 +5,18 @@
         <button type="submit" class="top-button" v-b-modal.modal1>Add New Product</button>
       </b-col>
     </b-row>
-
+    <h5>Or Filter List</h5>
+    <b-row align-h="center" class="text-center mb-4">
+      <b-col cols="6" sm="12" md="6">
+        <select class="form-control" v-model="search">
+          <option value="">Clear Search</option>
+          <option v-for="(product, idx) in products" :key="idx" :value="product.name">{{product.name}}</option>
+        </select>
+      </b-col>
+    </b-row>
     <!-- Admin Cards -->
     <b-card-group deck>
-      <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in products" :key="idx" class="product-card">
+      <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in filteredItems" :key="idx" class="product-card">
         <b-card
                 :img-src= "product.productImage"
                 img-alt="Img"
@@ -203,6 +211,11 @@ import firebase from 'firebase'
 export default {
   name: 'Products',
   computed: {
+    filteredItems () {
+      return this.products.filter(product => {
+        return product.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1
+      })
+    },
     user () {
       return this.$store.getters.getUser
     },
@@ -212,6 +225,7 @@ export default {
   },
   data () {
     return {
+      search: '',
       options: [
         { value: null, text: 'Please select an option' },
         { value: 'Lbs', text: 'Lbs' },
