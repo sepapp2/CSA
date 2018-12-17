@@ -10,13 +10,12 @@
       </b-col>
     </b-row>
 <b-card-group deck>
-      <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in filteredItems" :key="idx">
+      <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx" v-if="product.quantity>0">
         <b-card :title="product.name"
                 :img-src= "product.productImage"
                 img-alt="Img"
                 img-top
                 img-fluid
-                v-if="product.quantity>0"
                 class="product-card"
         >
             <p class="card-text">
@@ -32,7 +31,7 @@
             <div slot="footer">
                 <small class="text-muted">Last updated {{ product.modifiedDtm | moment("from", "now", true) }} ago</small>
                 <b-row align-h="center" class="text-center">
-                  <b-col cols="6">
+                  <b-col cols="10">
                     <b-input-group>
                       <b-form-input type="number" v-model="product.quantityAdd" v-bind:max="product.limitQuantity"></b-form-input>
                       <b-input-group-append>
@@ -95,5 +94,8 @@ a {
 }
 .home {
   margin-top: 15px;
+}
+.product-card {
+  margin-bottom: 15px!important;
 }
 </style>
