@@ -125,9 +125,9 @@
         </b-form-input>
       </b-form-group>
       <b-form-group id="productLogoInputGroup"
-                    label="Logo"
+                    label="Item Image"
                     label-for="productLogoInput">
-          <b-form-file v-model="file" ref="fileinput" accept="image/*" :state="Boolean(file)" placeholder="Choose a file..." @change="detectFiles($event.target.files)"></b-form-file>
+          <b-form-file v-model="file" ref="fileinputModal" accept="image/*" :state="Boolean(file)" placeholder="Choose a file..." @change="detectFiles($event.target.files)"></b-form-file>
           <div class="progress-bar" :style="{ width: progressUpload + '%'}">{{ progressUpload }}%</div>
       </b-form-group>
         <b-form-group id="productQuantityGroup"
@@ -299,7 +299,20 @@ export default {
       this.form.createdAt = new Date()
       this.form.modifiedDtm = new Date()
       db.collection('Products').add(this.form)
-      this.form = {}
+      this.form = {
+        name: '',
+        images: '',
+        description: '',
+        quantity: '',
+        quantityLabel: null,
+        productImage: '',
+        active: true,
+        displayQuantity: true,
+        limitQuantityAllowed: false,
+        limitQuantity: '',
+        quantityAdd: 1
+      }
+      this.$refs.fileinputModal.reset()
       this.progressUpload = 0
       this.$refs.modal.hide()
     },

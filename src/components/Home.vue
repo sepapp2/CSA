@@ -1,7 +1,16 @@
 <template>
   <div class="home">
+  <h5>Filter List</h5>
+    <b-row align-h="center" class="text-center mb-4">
+      <b-col cols="6" sm="12" md="6">
+        <select class="form-control" v-model="search">
+          <option value="">Clear Search</option>
+          <option v-for="(product, idx) in products" :key="idx" :value="product.name">{{product.name}}</option>
+        </select>
+      </b-col>
+    </b-row>
 <b-card-group deck>
-      <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in products" :key="idx">
+      <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in filteredItems" :key="idx">
         <b-card :title="product.name"
                 :img-src= "product.productImage"
                 img-alt="Img"
@@ -44,9 +53,17 @@ import { db } from '../main'
 import { mapActions } from 'vuex'
 export default {
   name: 'app',
+  computed: {
+    filteredItems () {
+      return this.products.filter(product => {
+        return product.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1
+      })
+    }
+  },
   data () {
     return {
-      products: []
+      products: [],
+      search: ''
     }
   },
   firestore () {
