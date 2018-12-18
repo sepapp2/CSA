@@ -14,6 +14,7 @@
       <b-form-input v-model="data.item.quantity"
                     type="number"
                     v-bind:max="data.item.quantityLimit"
+                    min="1"
                     >
       </b-form-input>
     </template>

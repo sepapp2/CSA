@@ -33,7 +33,7 @@
                 <b-row align-h="center" class="text-center">
                   <b-col cols="10">
                     <b-input-group>
-                      <b-form-input type="number" v-model="product.quantityAdd" v-bind:max="product.limitQuantity"></b-form-input>
+                      <b-form-input type="number" v-model="product.quantityAdd" v-bind:max="product.limitQuantity" min="1"></b-form-input>
                       <b-input-group-append>
                         <b-button @click="addToCart(product)" variant="outline-primary">Add to Cart</b-button>
                       </b-input-group-append>
