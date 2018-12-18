@@ -9,6 +9,9 @@
 
         <b-collapse is-nav id="nav_collapse">
           <b-navbar-nav>
+            <b-nav-item to="/home" v-if="!userProfile.admin">SHOP</b-nav-item>
+          </b-navbar-nav>
+          <b-navbar-nav>
             <b-nav-item to="/products" v-if="userProfile.admin">MANAGE PRODUCTS</b-nav-item>
           </b-navbar-nav>
           <b-navbar-nav>

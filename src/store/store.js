@@ -49,6 +49,10 @@ export const store = new Vuex.Store({
       state.added = []
     },
     ADD_TO_CART (state, id) {
+      if (id.quantityAdd > id.quantity) {
+        alert('You have entered more than the available quantity')
+        return
+      }
       const record = state.added.find(p => p.id === id.id)
       if (!record) {
         state.added.push({
@@ -62,10 +66,10 @@ export const store = new Vuex.Store({
           userName: state.userProfile.displayName
         })
         alert('Item added to cart.  To Checkout, please select the Checkout button at the top of the page')
-      } else if (parseInt(record.quantity) >= id.limitQuantity) {
+      } else if (parseInt(record.quantity) >= id.limitQuantity && id.limitQuantityAllowed) {
         alert('The maximum quantity allowed for this item is ' + id.limitQuantity)
       } else {
-        record.quantity++
+        record.quantity = parseInt(record.quantity) + parseInt(id.quantityAdd)
       }
     },
     setUser: state => {
