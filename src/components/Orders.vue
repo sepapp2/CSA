@@ -38,6 +38,12 @@
         <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
           View Order
         </b-button>
+        <b-button size="sm" v-if="row.item.isFilled" variant="success" @click.stop="markOrderFilled(row.item)" class="mr-1">
+          Mark Not Filled
+        </b-button>
+        <b-button size="sm" v-if="!row.item.isFilled" variant="success" @click.stop="markOrderFilled(row.item)" class="mr-1">
+          Mark Filled
+        </b-button>
       </template>
     </b-table>
     <b-row align-h="center">
@@ -45,27 +51,13 @@
         <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
       </b-col>
     </b-row>
-    <!-- <b-row>
-      <b-col md="2" offset-md="6">
-          <div class='link'>
-              <download-excel
-                      class = "btn btn-info m-2"
-:data   = "json_data"
-    :fields = "json_fields"
-    name    = "filename.xls"
-                      >
-                      Download Data
-              </download-excel>
-          </div>
-      </b-col>
-    </b-row> -->
     <!-- Info modal -->
     <b-modal id="modalInfo"
              @hide="resetModal"
              :title="modalInfo.title"
              size="lg"
-             ok-title="Mark Filled"
-             @ok="markOrderFilled(modelInfo.content)">
+             :ok-title="modalInfo.toggleFill"
+             @ok="markOrderFilled(modalInfo.content)">
             <b-card title="Contact Information">
                 <p class="card-text" v-if="modalInfo.content">
                     Email: {{modalInfo.content.userOrdering.email}}<br>
@@ -131,6 +123,11 @@ export default {
     info (item, index, button) {
       this.modalInfo.title = `Order for ${item.userName}`
       this.modalInfo.content = item
+      if (this.modalInfo.content.isFilled) {
+        this.modalInfo.toggleFill = 'Mark Not Filled'
+      } else {
+        this.modalInfo.toggleFill = 'Mark Filled'
+      }
       this.$root.$emit('bv::show::modal', 'modalInfo', button)
     },
     resetModal () {
@@ -142,9 +139,26 @@ export default {
       this.totalRows = filteredItems.length
       this.currentPage = 1
     },
-    markOrderFilled (evt, currentOrder) {
-      console.log(evt)
-      console.log(currentOrder)
+    markOrderFilled (evt) {
+      // Create a reference to the SF doc.
+      console.log(evt.id)
+      var sfDocRef = db.collection('orders').doc(evt.id)
+      return db.runTransaction(function (transaction) {
+        return transaction.get(sfDocRef).then(function (sfDoc) {
+          if (!sfDoc.exists) {
+            console.log('Document does not exist!')
+          }
+          if (sfDoc.data().isFilled) {
+            transaction.update(sfDocRef, { isFilled: false })
+          } else {
+            transaction.update(sfDocRef, { isFilled: true })
+          }
+        })
+      }).then(function () {
+        console.log('Transaction successfully committed!')
+      }).catch(function (error) {
+        console.log('Transaction failed: ', error)
+      })
     }
   }
 }

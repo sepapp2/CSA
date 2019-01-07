@@ -183,50 +183,6 @@ export default {
           if (doc.exists) {
             if (parseInt(product.quantity) > parseInt(doc.data().quantity)) {
               alert('Only ' + doc.data().quantity + ' ' + product.name + ' are available at this time.  Please edit your quantity and try again')
-            } else {
-              db.collection('orders').add({
-                uid: this.user.uid,
-                userOrdering: this.userProfile,
-                order: this.products,
-                orderTotal: this.total,
-                orderDate: new Date(),
-                isFilled: false,
-                userName: this.userProfile.displayName,
-                pickupLocation: this.form.pickupLocation,
-                affiliation: this.form.affiliation,
-                textReminders: this.form.texts,
-                partnerFirstName: this.form.partnerFirstName,
-                partnerLastName: this.form.partnerLastName,
-                partnerEmail: this.form.partnerEmail,
-                paymentMethod: this.form.paymentMethod,
-                paymentPlan: this.form.paymentPlan,
-                cellPhone: this.form.cellPhone,
-                cellCarrier: this.form.cellCarrier
-              })
-                .then(docRef => {
-                  this.products.forEach(item => {
-                    var orderDocRef = db.collection('Products').doc(item.id)
-                    return db.runTransaction(transaction => {
-                      return transaction.get(orderDocRef).then(orderDoc => {
-                        if (!orderDoc.exists) {
-                          console.log('Document does not exist!')
-                        }
-                        var newQty = parseInt(orderDoc.data().quantity) - item.quantity
-                        transaction.update(orderDocRef, { quantity: newQty })
-                      })
-                    }).then(function () {
-                      console.log('Transaction successfully committed!')
-                    }).catch(function (error) {
-                      console.log('Transaction failed: ', error)
-                    })
-                  })
-                  alert('Order Placed')
-                  this.$store.dispatch('clearCart')
-                })
-                .catch(function (error) {
-                  alert('Error placing order, please try again')
-                  console.log(error)
-                })
             }
           } else {
             alert(product.name + ' is no longer available for purchase')
@@ -235,6 +191,49 @@ export default {
           console.log('Error getting document:', error)
         })
       })
+      db.collection('orders').add({
+        uid: this.user.uid,
+        userOrdering: this.userProfile,
+        order: this.products,
+        orderTotal: this.total,
+        orderDate: new Date(),
+        isFilled: false,
+        userName: this.userProfile.displayName,
+        pickupLocation: this.form.pickupLocation,
+        affiliation: this.form.affiliation,
+        textReminders: this.form.texts,
+        partnerFirstName: this.form.partnerFirstName,
+        partnerLastName: this.form.partnerLastName,
+        partnerEmail: this.form.partnerEmail,
+        paymentMethod: this.form.paymentMethod,
+        paymentPlan: this.form.paymentPlan,
+        cellPhone: this.form.cellPhone,
+        cellCarrier: this.form.cellCarrier
+      })
+        .then(docRef => {
+          this.products.forEach(item => {
+            var orderDocRef = db.collection('Products').doc(item.id)
+            return db.runTransaction(transaction => {
+              return transaction.get(orderDocRef).then(orderDoc => {
+                if (!orderDoc.exists) {
+                  console.log('Document does not exist!')
+                }
+                var newQty = parseInt(orderDoc.data().quantity) - item.quantity
+                transaction.update(orderDocRef, { quantity: newQty })
+              })
+            }).then(function () {
+              console.log('Transaction successfully committed!')
+            }).catch(function (error) {
+              console.log('Transaction failed: ', error)
+            })
+          })
+        })
+        .catch(function (error) {
+          alert('Error placing order, please try again')
+          console.log(error)
+        })
+      alert('Order Placed')
+      this.$store.dispatch('clearCart')
     },
     ...mapActions([
       'removeFromCart'

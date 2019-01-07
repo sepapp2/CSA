@@ -14,6 +14,10 @@ import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons'
 import { config } from './config/firebaseConfig'
 import { store } from './store/store'
+import { quillEditor } from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
@@ -21,6 +25,7 @@ Vue.use(require('vue-moment'))
 Vue.use(VueFire)
 Vue.component('downloadExcel', JsonExcel)
 Vue.component('icon', Icon)
+Vue.component('quill-editor', quillEditor)
 firebase.initializeApp(config)
 export const storage = firebase.storage()
 export const db = firebase.firestore()
@@ -29,7 +34,7 @@ firebase.auth().onAuthStateChanged(function (user) {
   new Vue({
     el: '#app',
     router,
-    components: { App },
+    components: { App, quillEditor },
     store: store,
     template: '<App/>'
   })

@@ -11,6 +11,7 @@ import MyOrders from '@/components/MyOrders'
 import Orders from '@/components/Orders'
 import ItemSummary from '@/components/ItemSummary'
 import AboutUs from '@/components/AboutUs'
+import UserEmail from '@/components/UserEmail'
 import firebase from 'firebase'
 import { db } from '../main'
 
@@ -20,11 +21,11 @@ let router = new Router({
   routes: [
     {
       path: '*',
-      redirect: '/home'
+      redirect: '/aboutUs'
     },
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/aboutUs'
     },
     {
       path: '/home',
@@ -108,6 +109,15 @@ let router = new Router({
       path: '/aboutUs',
       name: 'AboutUs',
       component: AboutUs
+    },
+    {
+      path: '/userEmail',
+      name: 'UserEmail',
+      component: UserEmail,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      }
     }
   ]
 })

@@ -16,6 +16,8 @@
 'use strict';
 
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp(functions.config().firebase);
 const nodemailer = require('nodemailer');
 // Configure the email transport using the default SMTP transport and a GMail account.
 // For Gmail, enable these:
@@ -46,13 +48,22 @@ exports.newOrder = functions.firestore
             from: `${APP_NAME} <donoreply@uky.edu>`,
             to: email,
           };
-        
-          // The user unsubscribed to the newsletter.
-          mailOptions.subject = `Your UKCSA Order Has Been Placed`;
-            mailOptions.html = `Please visit the website to view ordering history.</br><a href="https://uk-csa.firebaseapp.com/#/myOrders">UKCSA</a>`;
-            return mailTransport.sendMail(mailOptions).then(() => {
-            return console.log('Order Confirmation email sent to:', email);
-          });     
+          const store = admin.firestore()
+          store.collection('email').doc('emailText').get().then(doc => {
+              if (doc.exists) {
+                const emailText = doc.data().emailText
+                mailOptions.subject = `Your UKCSA Order Has Been Placed`;
+                mailOptions.html = emailText;
+                mailTransport.sendMail(mailOptions)
+                return Promise.resolve("Finished")
+              }
+              else {
+                return Promise.resolve("Finished")
+              }
+          }).catch(reason => {
+              console.log(reason)
+          })
+            return console.log('Order Confirmation email sent.');
     });
 
 
