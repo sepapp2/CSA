@@ -231,6 +231,7 @@ export default {
         { value: 'Lbs', text: 'Lbs' },
         { value: 'Bunch', text: 'Bunch' },
         { value: 'Each', text: 'Each' },
+        { value: 'Bag', text: 'Bag' },
         { value: 'Share', text: 'Share' }
       ],
       form: {

@@ -44,6 +44,9 @@
         <b-button size="sm" v-if="!row.item.isFilled" variant="success" @click.stop="markOrderFilled(row.item)" class="mr-1">
           Mark Filled
         </b-button>
+        <b-button size="sm" variant="danger" @click.stop="deleteOrder(row.item)" class="mr-1">
+          Delete Order
+        </b-button>
       </template>
     </b-table>
     <b-row align-h="center">
@@ -138,6 +141,29 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length
       this.currentPage = 1
+    },
+    deleteOrder (evt) {
+      db.collection('orders').doc(evt.id).delete().then(function () {
+        evt.order.forEach(item => {
+          var orderDocRef = db.collection('Products').doc(item.id)
+          return db.runTransaction(transaction => {
+            return transaction.get(orderDocRef).then(orderDoc => {
+              if (!orderDoc.exists) {
+                console.log('Document does not exist!')
+              }
+              var newQty = parseInt(orderDoc.data().quantity) + parseInt(item.quantity)
+              transaction.update(orderDocRef, { quantity: newQty })
+            })
+          }).then(function () {
+            console.log('Transaction successfully committed!')
+          }).catch(function (error) {
+            console.log('Transaction failed: ', error)
+          })
+        })
+        alert('Order Deleted')
+      }).catch(function (error) {
+        console.error('Error removing document: ', error)
+      })
     },
     markOrderFilled (evt) {
       // Create a reference to the SF doc.

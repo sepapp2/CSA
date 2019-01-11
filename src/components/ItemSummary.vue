@@ -2,13 +2,16 @@
     <div class="itemSummary">
       <h1>Items Ordered</h1>
       <b-row class="mb2">
-        <b-col sm="3"><b-form-input id="startDate" type="date" v-model="startDate"></b-form-input></b-col>
-        <b-col sm="3"><b-form-input id="endDate" type="date" v-model="endDate"></b-form-input></b-col>
-        <b-col sm="2">
+        <b-col md="3" sm="12"><b-form-input id="startDate" type="date" v-model="startDate"></b-form-input></b-col>
+        <b-col md="3" sm="12"><b-form-input id="endDate" type="date" v-model="endDate"></b-form-input></b-col>
+        <b-col md="3" sm="12">
+          <b-dropdown id="ddownEmail" text="Actions" variant="primary">
           <download-excel
             :data = "betweenDates">
-            <b-button variant="outline-primary">Download to Excel</b-button>
+            <b-dropdown-item >Download to Excel</b-dropdown-item>
           </download-excel>
+          <b-dropdown-item :href="'mailto:?bcc=' + emailUsers">Email All Users</b-dropdown-item>
+          </b-dropdown>
         </b-col>
       </b-row>
       <b-row>
@@ -47,6 +50,7 @@ export default {
           if (!record) {
             this.matrixOrders.push({
               customerName: part2.userName,
+              customerEmail: part.userOrdering.email,
               itemOrdered: part2.id,
               itemName: part2.name,
               itemQuantity: parseInt(part2.quantity),
@@ -57,7 +61,17 @@ export default {
           }
         }, part)
       }, this.filteredOrders)
-      return this.matrixOrders
+      this.matrixOrders.forEach(itemSet => {
+        delete itemSet.itemOrdered
+        this.cleanedMatrixOrders.push(itemSet)
+      })
+      return this.cleanedMatrixOrders
+    },
+    emailUsers () {
+      this.betweenDates.forEach(element => {
+        this.emailList.push(element.customerEmail)
+      })
+      return Array.from(new Set(this.emailList))
     },
     itemsTotal () {
       this.matrixItems = []
@@ -85,12 +99,14 @@ export default {
       ],
       finalMatrix: {},
       matrixOrders: [],
+      cleanedMatrixOrders: [],
       itemTotals: [],
       orders: [],
       result: [],
       matrixItems: [],
       startDate: new Date(),
-      endDate: new Date()
+      endDate: new Date(),
+      emailList: []
     }
   },
   firestore () {

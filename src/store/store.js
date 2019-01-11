@@ -49,7 +49,7 @@ export const store = new Vuex.Store({
       state.added = []
     },
     ADD_TO_CART (state, id) {
-      if (id.quantityAdd > id.quantity) {
+      if (parseInt(id.quantityAdd) > parseInt(id.quantity)) {
         alert('You have entered more than the available quantity')
         return
       }
