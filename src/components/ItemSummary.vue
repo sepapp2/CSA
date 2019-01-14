@@ -61,11 +61,7 @@ export default {
           }
         }, part)
       }, this.filteredOrders)
-      this.matrixOrders.forEach(itemSet => {
-        delete itemSet.itemOrdered
-        this.cleanedMatrixOrders.push(itemSet)
-      })
-      return this.cleanedMatrixOrders
+      return this.matrixOrders
     },
     emailUsers () {
       this.betweenDates.forEach(element => {
