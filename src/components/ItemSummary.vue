@@ -43,7 +43,13 @@ export default {
   computed: {
     betweenDates () {
       this.matrixOrders = []
-      let filteredOrders = this.orders.filter(order => (new Date(order.orderDate)).getTime() >= (new Date(this.startDate)).getTime() && (new Date(order.orderDate)).getTime() <= (new Date(this.endDate)).getTime())
+      let start = new Date(this.startDate)
+      start.setHours(0)
+      start.setDate(start.getDate() + 1)
+      let end = new Date(this.endDate)
+      end.setHours(end.getHours() + 5)
+      end.setDate(end.getDate() + 1)
+      let filteredOrders = this.orders.filter(order => (new Date(order.orderDate)) >= start && (new Date(order.orderDate)) <= end)
       filteredOrders.forEach(part => {
         part.order.forEach(part2 => {
           const record = this.matrixOrders.find(order => order.itemOrdered === part2.id && order.customerName === part2.userName)
