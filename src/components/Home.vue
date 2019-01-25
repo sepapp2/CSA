@@ -10,7 +10,7 @@
         </template>
       </b-jumbotron>
     </div>
-    <div v-if="storeStatus.status">
+    <div v-if="storeStatus.status" class="store-front">
       <h5>Filter List</h5>
         <b-row align-h="center" class="text-center mb-4">
           <b-col cols="6" sm="12" md="6">
@@ -106,10 +106,13 @@ li {
 a {
   color: #42b983;
 }
-.home {
+.store-front {
   margin-top: 15px;
 }
 .product-card {
   margin-bottom: 15px!important;
+}
+.jumbotron {
+  border-radius: 0px;
 }
 </style>
