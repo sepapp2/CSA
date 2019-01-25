@@ -1,6 +1,6 @@
 <template>
     <div class="itemSummary">
-      <h1>Items Ordered</h1>
+      <h1>Items Summary</h1>
       <b-row class="mb2">
         <b-col md="3" sm="12"><b-form-input id="startDate" type="date" v-model="startDate"></b-form-input></b-col>
         <b-col md="3" sm="12"><b-form-input id="endDate" type="date" v-model="endDate"></b-form-input></b-col>

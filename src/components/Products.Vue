@@ -1,9 +1,13 @@
 <template>
   <div class="products">
-    <b-row align-h="center" class="text-center">
-      <b-col cols="12" sm="12" md="8">
-        <button type="submit" class="top-button" v-b-modal.modal1>Add New Product</button>
-      </b-col>
+    <b-row align-h="center" class="text-center button-row">
+      <b-button-toolbar key-nav  aria-label="Toolbar with button groups">
+        <b-button-group class="mx-1">
+          <b-btn v-b-modal.modal1>Add New Product</b-btn>
+          <b-btn v-if="!storeStatus.status" @click="changeStoreStatus()">Make Store Active</b-btn>
+          <b-btn v-if="storeStatus.status" @click="changeStoreStatus()">Make Store Inactive</b-btn>
+        </b-button-group>
+      </b-button-toolbar>
     </b-row>
     <h5>Or Filter List</h5>
     <b-row align-h="center" class="text-center mb-4">
@@ -252,12 +256,14 @@ export default {
       uploadTask: '',
       downloadURL: '',
       products: [],
+      storeStatus: [],
       show: true
     }
   },
   firestore () {
     return {
-      products: db.collection('Products').orderBy('name', 'asc')
+      products: db.collection('Products').orderBy('name', 'asc'),
+      storeStatus: db.collection('StoreStatus').doc('status')
     }
   },
   methods: {
@@ -329,6 +335,25 @@ export default {
       this.show = false
       this.$nextTick(() => { this.show = true })
       this.$refs.modal.hide()
+    },
+    changeStoreStatus () {
+      var sfDocRef = db.collection('StoreStatus').doc('status')
+      return db.runTransaction(function (transaction) {
+        return transaction.get(sfDocRef).then(function (sfDoc) {
+          if (!sfDoc.exists) {
+            console.log('Document does not exist!')
+          }
+          if (sfDoc.data().status) {
+            transaction.update(sfDocRef, { status: false })
+          } else {
+            transaction.update(sfDocRef, { status: true })
+          }
+        })
+      }).then(function () {
+        console.log('Transaction successfully committed!')
+      }).catch(function (error) {
+        console.log('Transaction failed: ', error)
+      })
     },
     detectFiles (fileList) {
       Array.from(Array(fileList.length).keys()).map(x => {
@@ -493,5 +518,8 @@ a {
 }
 .font-double {
   font-size: 2rem;
+}
+.button-row {
+  margin-bottom: 15px;
 }
 </style>
