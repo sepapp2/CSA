@@ -75,7 +75,8 @@ export default {
     return {
       products: [],
       search: '',
-      storeStatus: []
+      storeStatus: 
+       { status: true }
     }
   },
   firestore () {

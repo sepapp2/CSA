@@ -173,6 +173,8 @@ export default {
   },
   methods: {
     checkout () {
+      let productCount = 0
+      let placeOrder = true
       if (this.products.filter(order => order.quantityLabel === 'Share').length > 0 && this.formValid === false) {
         this.$refs.myModalRef.show()
         return
@@ -180,54 +182,61 @@ export default {
       this.products.forEach(product => {
         var docRef = db.collection('Products').doc(product.id)
         docRef.get().then(doc => {
-          if (doc.exists) {
-            if (parseInt(product.quantity) > parseInt(doc.data().quantity)) {
-              alert('Only ' + doc.data().quantity + ' ' + product.name + ' are available at this time.  Please edit your quantity and try again')
-            }
-          } else {
+          if (doc.exists && (parseInt(product.quantity) > parseInt(doc.data().quantity))) {
+            alert('Only ' + doc.data().quantity + ' ' + product.name + ' are available at this time.  Please edit your quantity and try again')
+            placeOrder = false
+          } else if (doc.exists && (parseInt(product.quantity) > parseInt(product.quantityLimit))) {
+            alert('You are trying to order more than the allowed limit of ' + product.quantityLimit + '.  Please change the amount in your cart and try again.')
+            placeOrder = false
+          } else if (!doc.exists) {
             alert(product.name + ' is no longer available for purchase')
+            placeOrder = false
+          } else {
+            productCount++
+            if (placeOrder && productCount == this.products.length) {
+              db.collection('orders').add({
+                  uid: this.user.uid,
+                  userOrdering: this.userProfile,
+                  order: this.products,
+                  orderTotal: this.total,
+                  orderDate: new Date(),
+                  isFilled: false,
+                  userName: this.userProfile.displayName,
+                  pickupLocation: this.form.pickupLocation,
+                  affiliation: this.form.affiliation,
+                  textReminders: this.form.texts,
+                  partnerFirstName: this.form.partnerFirstName,
+                  partnerLastName: this.form.partnerLastName,
+                  partnerEmail: this.form.partnerEmail,
+                  paymentMethod: this.form.paymentMethod,
+                  paymentPlan: this.form.paymentPlan,
+                  cellPhone: this.form.cellPhone,
+                  cellCarrier: this.form.cellCarrier
+                })
+                this.products.forEach(item => {
+                  var orderDocRef = db.collection('Products').doc(item.id)
+                  return db.runTransaction(transaction => {
+                    return transaction.get(orderDocRef).then(orderDoc => {
+                      if (!orderDoc.exists) {
+                        console.log('Document does not exist!')
+                      }
+                      var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
+                      transaction.update(orderDocRef, { quantity: newQty })
+                    })
+                  }).then(function () {
+                    console.log('Transaction successfully committed!')
+                  }).catch(function (error) {
+                    console.log('Transaction failed: ', error)
+                  })
+                })
+                alert('Order Placed')
+                this.$store.dispatch('clearCart')
+            }
           }
         }).catch(function (error) {
           console.log('Error getting document:', error)
         })
       })
-      db.collection('orders').add({
-        uid: this.user.uid,
-        userOrdering: this.userProfile,
-        order: this.products,
-        orderTotal: this.total,
-        orderDate: new Date(),
-        isFilled: false,
-        userName: this.userProfile.displayName,
-        pickupLocation: this.form.pickupLocation,
-        affiliation: this.form.affiliation,
-        textReminders: this.form.texts,
-        partnerFirstName: this.form.partnerFirstName,
-        partnerLastName: this.form.partnerLastName,
-        partnerEmail: this.form.partnerEmail,
-        paymentMethod: this.form.paymentMethod,
-        paymentPlan: this.form.paymentPlan,
-        cellPhone: this.form.cellPhone,
-        cellCarrier: this.form.cellCarrier
-      })
-      this.products.forEach(item => {
-        var orderDocRef = db.collection('Products').doc(item.id)
-        return db.runTransaction(transaction => {
-          return transaction.get(orderDocRef).then(orderDoc => {
-            if (!orderDoc.exists) {
-              console.log('Document does not exist!')
-            }
-            var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
-            transaction.update(orderDocRef, { quantity: newQty })
-          })
-        }).then(function () {
-          console.log('Transaction successfully committed!')
-        }).catch(function (error) {
-          console.log('Transaction failed: ', error)
-        })
-      })
-      alert('Order Placed')
-      this.$store.dispatch('clearCart')
     },
     ...mapActions([
       'removeFromCart'
