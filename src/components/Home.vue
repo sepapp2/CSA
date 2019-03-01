@@ -11,8 +11,9 @@
       </b-jumbotron>
     </div>
     <div v-if="storeStatus.status" class="store-front">
-      <h5 v-if="user.email != 'uk.csa@uky.edu'">Filter List</h5>
-        <b-row align-h="center" class="text-center mb-4" v-if="user.email != 'uk-csa@uky.edu'">
+      <b-button v-if="user.email == 'uk.csa@uky.edu'" @click="toggleView()" variant="outline-primary"class = "mobile-ordering">Toggle View</b-button>
+      <h5 v-if="!showAdmin">Filter List</h5>
+        <b-row align-h="center" class="text-center mb-4" v-if="!showAdmin">
           <b-col cols="6" sm="12" md="6">
             <select class="form-control" v-model="search">
               <option value="">Clear Search</option>
@@ -20,7 +21,7 @@
             </select>
           </b-col>
         </b-row>
-      <div v-if="user.email == 'uk.csa@uky.edu'">
+      <div v-if="showAdmin">
         <b-row v-for="(product, idx) in availableProducts" :key="idx" align-h="center" class="text-center mobile-ordering">
           <b-col cols="6">
             <b-input-group :prepend="product.name">
@@ -32,7 +33,7 @@
           </b-col>
         </b-row>
       </div>
-    <b-card-group deck v-if="user.email != 'uk.csa@uky.edu'">
+    <b-card-group deck v-if="!showAdmin">
           <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx" v-if="product.quantity>0">
             <b-card :title="product.name"
                     :img-src= "product.productImage"
@@ -85,6 +86,11 @@ export default {
         return product.quantity > 0
       })
     },
+    showAdmin () {
+      if (this.$store.getters.getUser.email == 'uk.csa@uky.edu' && this.adminView == true) {
+        return true
+      }
+    },
     filteredItems () {
       return this.products.filter(product => {
         return product.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1
@@ -95,6 +101,7 @@ export default {
     return {
       products: [],
       search: '',
+      adminView: true,
       storeStatus: 
        { status: true }
     }
@@ -105,9 +112,14 @@ export default {
       storeStatus: db.collection('StoreStatus').doc('status')
     }
   },
-  methods: mapActions([
-    'addToCart'
-  ])
+  methods: {
+    toggleView () {
+      this.adminView = !this.adminView
+    },
+    ...mapActions([
+      'addToCart'
+    ])
+  }
 }
 </script>
 
