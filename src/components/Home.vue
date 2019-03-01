@@ -11,7 +11,7 @@
       </b-jumbotron>
     </div>
     <div v-if="storeStatus.status" class="store-front">
-      <h5 v-if="user.email != 'uk-csa@uky.edu'">Filter List</h5>
+      <h5 v-if="user.email != 'uk.csa@uky.edu'">Filter List</h5>
         <b-row align-h="center" class="text-center mb-4" v-if="user.email != 'uk-csa@uky.edu'">
           <b-col cols="6" sm="12" md="6">
             <select class="form-control" v-model="search">
@@ -20,7 +20,7 @@
             </select>
           </b-col>
         </b-row>
-      <div v-if="user.email == 'uk-csa@uky.edu'">
+      <div v-if="user.email == 'uk.csa@uky.edu'">
         <b-row v-for="(product, idx) in availableProducts" :key="idx" align-h="center" class="text-center mobile-ordering">
           <b-col cols="6">
             <b-input-group :prepend="product.name">
@@ -32,7 +32,7 @@
           </b-col>
         </b-row>
       </div>
-    <b-card-group deck v-if="user.email != 'uk-csa@uky.edu'">
+    <b-card-group deck v-if="user.email != 'uk.csa@uky.edu'">
           <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx" v-if="product.quantity>0">
             <b-card :title="product.name"
                     :img-src= "product.productImage"
