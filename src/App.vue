@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-navbar toggleable="md" type="light" class="bg-navbar">
+    <b-navbar toggleable="lg" type="light" class="bg-navbar">
 
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
         <b-navbar-brand to="/home">

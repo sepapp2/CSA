@@ -50,7 +50,7 @@ exports.newOrder = functions.firestore
           };
           const store = admin.firestore()
           store.collection('email').doc('emailText').get().then(doc => {
-              if (doc.exists) {
+              if (doc.exists && newValue.userOrdering.email !== "uk.csa@uky.edu") {
                 const emailText = doc.data().emailText
                 mailOptions.subject = `Your UKCSA Order Has Been Placed`;
                 mailOptions.html = emailText;

@@ -11,8 +11,8 @@
       </b-jumbotron>
     </div>
     <div v-if="storeStatus.status" class="store-front">
-      <h5>Filter List</h5>
-        <b-row align-h="center" class="text-center mb-4">
+      <h5 v-if="user.email != 'uk-csa@uky.edu'">Filter List</h5>
+        <b-row align-h="center" class="text-center mb-4" v-if="user.email != 'uk-csa@uky.edu'">
           <b-col cols="6" sm="12" md="6">
             <select class="form-control" v-model="search">
               <option value="">Clear Search</option>
@@ -20,7 +20,19 @@
             </select>
           </b-col>
         </b-row>
-    <b-card-group deck>
+      <div v-if="user.email == 'uk-csa@uky.edu'">
+        <b-row v-for="(product, idx) in availableProducts" :key="idx" align-h="center" class="text-center mobile-ordering">
+          <b-col cols="6">
+            <b-input-group :prepend="product.name">
+              <b-form-input type="number" v-model="product.quantityAdd" v-bind:max="product.limitQuantity" min="1"></b-form-input>
+                  <b-input-group-append>
+                    <b-button @click="addToCart(product)" variant="outline-primary">Add to Cart</b-button>
+                  </b-input-group-append>
+            </b-input-group>
+          </b-col>
+        </b-row>
+      </div>
+    <b-card-group deck v-if="user.email != 'uk-csa@uky.edu'">
           <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx" v-if="product.quantity>0">
             <b-card :title="product.name"
                     :img-src= "product.productImage"
@@ -65,6 +77,14 @@ import { mapActions } from 'vuex'
 export default {
   name: 'app',
   computed: {
+    user () {
+      return this.$store.getters.getUser
+    },
+    availableProducts () {
+      return this.products.filter(product => {
+        return product.quantity > 0
+      })
+    },
     filteredItems () {
       return this.products.filter(product => {
         return product.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1
@@ -115,5 +135,8 @@ a {
 }
 .jumbotron {
   border-radius: 0px;
+}
+.mobile-ordering {
+  margin-bottom: 15px;
 }
 </style>
