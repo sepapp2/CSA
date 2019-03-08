@@ -65,7 +65,9 @@ export const store = new Vuex.Store({
           quantityLimit: id.limitQuantity,
           userName: state.userProfile.displayName
         })
-        alert('Item added to cart.  To Checkout, please select the Checkout button at the top of the page')
+        if (state.userProfile.email !== 'uk.csa@uky.edu') {
+          alert('Item added to cart.  To Checkout, please select the Checkout button at the top of the page')
+        }
       } else if (parseInt(record.quantity) >= id.limitQuantity && id.limitQuantityAllowed) {
         alert('The maximum quantity allowed for this item is ' + id.limitQuantity)
       } else {
