@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
+import FarmStand from '@/components/FarmStand'
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
 import Profile from '@/components/Profile'
@@ -33,6 +34,15 @@ let router = new Router({
       component: Home,
       meta: {
         requiresAuth: true
+      }
+    },
+    {
+      path: '/farmstand',
+      name: 'FarmStand',
+      component: FarmStand,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
       }
     },
     {

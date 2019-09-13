@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="farmstand">
     <div v-if="!storeStatus.status">
       <b-jumbotron bg-variant="info" text-variant="white" border-variant="dark">
         <template slot="header">
@@ -39,10 +39,6 @@
     <b-card-group deck v-if="!showAdmin">
           <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx" v-if="product.quantity>0">
             <b-card :title="product.name"
-                    :img-src= "product.productImage"
-                    img-alt="Img"
-                    img-top
-                    img-fluid
                     class="product-card"
             >
                 <p class="card-text">
@@ -79,7 +75,7 @@
 import { db } from '../main'
 import { mapActions } from 'vuex'
 export default {
-  name: 'app',
+  name: 'FarmStand',
   computed: {
     user () {
       return this.$store.getters.getUser
@@ -111,7 +107,7 @@ export default {
   },
   firestore () {
     return {
-      products: db.collection('Products').where('active', '==', true).where('displayPublic', '==', true).orderBy('name', 'asc'),
+      products: db.collection('Products').where('active', '==', true).orderBy('name', 'asc'),
       storeStatus: db.collection('StoreStatus').doc('status')
     }
   },

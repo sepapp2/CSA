@@ -54,6 +54,11 @@
                     <b-form-select id="productQuantityLabel" v-model="product.quantityLabel" :options="options" class="mb-3"/>
                   </b-form-group>
                     <b-form-group>
+                      <b-form-checkbox v-model="product.displayPublic">
+                        Display on Public Storefront
+                      </b-form-checkbox>
+                    </b-form-group>
+                    <b-form-group>
                       <b-form-checkbox v-model="product.displayQuantity">
                         Display Available Quantity to Users
                       </b-form-checkbox>
@@ -150,6 +155,11 @@
       <b-form-select id="productQuantityLabel" v-model="form.quantityLabel" :options="options" class="mb-3"/>
       </b-form-group>
         <b-form-group>
+          <b-form-checkbox v-model="form.displayPublic">
+            Display on Public Storefront
+          </b-form-checkbox>
+        </b-form-group>
+        <b-form-group>
           <b-form-checkbox v-model="form.displayQuantity">
             Display Available Quantity to Users
           </b-form-checkbox>
@@ -236,6 +246,7 @@ export default {
         { value: 'Bunch', text: 'Bunch' },
         { value: 'Each', text: 'Each' },
         { value: 'Bag', text: 'Bag' },
+        { value: 'Box', text: 'Box' },
         { value: 'Share', text: 'Share' }
       ],
       form: {
@@ -246,6 +257,7 @@ export default {
         quantityLabel: null,
         productImage: '',
         active: true,
+        displayPublic: true,
         displayQuantity: true,
         limitQuantityAllowed: false,
         limitQuantity: '',
@@ -280,6 +292,7 @@ export default {
           transaction.update(sfDocRef, {
             quantity: product.quantity,
             quantityLabel: product.quantityLabel,
+            displayPublic: product.displayPublic,
             displayQuantity: product.displayQuantity,
             limitQuantityAllowed: product.limitQuantityAllowed,
             limitQuantity: product.limitQuantity,
@@ -314,6 +327,7 @@ export default {
         quantityLabel: null,
         productImage: '',
         active: true,
+        displayPublic: true,
         displayQuantity: true,
         limitQuantityAllowed: false,
         limitQuantity: '',

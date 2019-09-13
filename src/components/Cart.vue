@@ -195,24 +195,24 @@ export default {
             productCount++
             if (placeOrder && productCount == this.products.length) {
               db.collection('orders').add({
-                  uid: this.user.uid,
-                  userOrdering: this.userProfile,
-                  order: this.products,
-                  orderTotal: this.total,
-                  orderDate: new Date(),
-                  isFilled: false,
-                  userName: this.userProfile.displayName,
-                  pickupLocation: this.form.pickupLocation,
-                  affiliation: this.form.affiliation,
-                  textReminders: this.form.texts,
-                  partnerFirstName: this.form.partnerFirstName,
-                  partnerLastName: this.form.partnerLastName,
-                  partnerEmail: this.form.partnerEmail,
-                  paymentMethod: this.form.paymentMethod,
-                  paymentPlan: this.form.paymentPlan,
-                  cellPhone: this.form.cellPhone,
-                  cellCarrier: this.form.cellCarrier
-                })
+                uid: this.user.uid,
+                userOrdering: this.userProfile,
+                order: this.products,
+                orderTotal: this.total,
+                orderDate: new Date(),
+                isFilled: false,
+                userName: this.userProfile.displayName,
+                pickupLocation: this.form.pickupLocation,
+                affiliation: this.form.affiliation,
+                textReminders: this.form.texts,
+                partnerFirstName: this.form.partnerFirstName,
+                partnerLastName: this.form.partnerLastName,
+                partnerEmail: this.form.partnerEmail,
+                paymentMethod: this.form.paymentMethod,
+                paymentPlan: this.form.paymentPlan,
+                cellPhone: this.form.cellPhone,
+                cellCarrier: this.form.cellCarrier
+              })
                 this.products.forEach(item => {
                   var orderDocRef = db.collection('Products').doc(item.id)
                   return db.runTransaction(transaction => {

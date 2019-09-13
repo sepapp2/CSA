@@ -16,6 +16,7 @@
           </b-navbar-nav>
           <b-navbar-nav>
             <b-nav-item-dropdown right text="ADMIN" id="report-menu-dropdown" v-if="userProfile.admin">
+              <b-dropdown-item to="/farmstand" v-if="userProfile.admin">FarmStand</b-dropdown-item>
               <b-dropdown-item to="/orders" v-if="userProfile.admin">Orders</b-dropdown-item>
               <b-dropdown-item to="/itemSummary" v-if="userProfile.admin">Item Summary</b-dropdown-item>
               <b-dropdown-item to="/userEmail" v-if="userProfile.admin">Email Text</b-dropdown-item>
