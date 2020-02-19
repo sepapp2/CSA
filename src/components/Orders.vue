@@ -33,6 +33,7 @@
       <template slot="userName" slot-scope="row">{{row.item.userName}}</template>
       <template slot="orderDate" slot-scope="row">{{row.item.orderDate | moment("MM/DD/YYYY")}}</template>
       <template slot="orderTotal" slot-scope="row">${{row.item.orderTotal}}</template>
+      <template slot="paymentType" slot-scope="row">{{row.item.paymentType}}</template>
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
@@ -106,6 +107,7 @@ export default {
         { key: 'userName', label: 'Person Ordering', sortable: true, sortDirection: 'desc' },
         { key: 'orderDate', label: 'Order Date', 'class': 'text-center' },
         { key: 'orderTotal', label: 'Order Total' },
+        { key: 'paymentType', label: 'Payment Type' },
         { key: 'actions', label: 'Actions' }
       ],
       currentPage: 1,

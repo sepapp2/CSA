@@ -1,6 +1,13 @@
 <template>
     <div class="about-us">
-        <b-alert show variant="success" v-if="!user">
+        <div class="position-relative overflow-hidden p-1 p-md-2 text-center text-white bg-gradient" v-if="!user">
+            <div class="col-md-5 p-lg-5 mx-auto my-5">
+                <h1 class="display-4 font-weight-normal">CSA Farmstand</h1>
+                <p class="lead font-weight-normal">Items available will be on a first come, first served basis. We accept cash, check and credit cards.  Payment can be made at time of pickup.</p>
+                <router-link to="home" class="btn btn-info btn-lg">Shop Now</router-link>
+            </div>
+        </div>
+        <!-- <b-alert show variant="success" v-if="!user">
             <h4 class="alert-heading">Welcome!</h4>
                 <p>
                     To get started and pre-order items from our farm stand, please click <router-link to="login">here</router-link> to login or <router-link to="sign-up">here</router-link> to create an account!
@@ -9,7 +16,7 @@
                 <p class="mb-0">
                     Items available will be on a first come, first served basis. We accept cash, check and credit cards.
                 </p>
-        </b-alert>
+        </b-alert> -->
         <b-jumbotron>
             <template slot="header">
                 Our CSA
@@ -43,5 +50,7 @@ export default {
 }
 </script>
 <style scoped>
-
+.bg-gradient {
+    background: linear-gradient(40deg,#45cafc,#303f9f)!important;
+}
 </style>

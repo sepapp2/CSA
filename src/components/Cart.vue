@@ -34,6 +34,17 @@
             <h3> Total: ${{ total | round(2)}}</h3>
       </b-col>
   </b-row>
+  <b-row>
+      <b-col cols="12" align-h="right" class="text-right">
+            <b-form-group label="Payment Method">
+              <b-form-radio-group id="radio-group" v-model="paymentType" >
+                <b-form-radio value="Cash">Cash</b-form-radio>
+                <b-form-radio value="Check">Check</b-form-radio>
+                <b-form-radio value="Credit Card">Credit Card</b-form-radio>
+              </b-form-radio-group>
+            </b-form-group>
+      </b-col>
+  </b-row>
   <b-row v-show="products.length">
       <b-col cols="12" align-h="right" class="text-right">
           <b-button variant="outline-success" size="lg" @click="checkout()">Place Order</b-button>
@@ -133,6 +144,7 @@ export default {
         { key: 'total', label: 'Total' },
         { key: 'removeItem', label: 'Actions' }
       ],
+      paymentType: null,
       form: {
         pickupLocation: null,
         affiliation: null,
@@ -201,6 +213,7 @@ export default {
                 orderTotal: this.total,
                 orderDate: new Date(),
                 isFilled: false,
+                paymentType: this.paymentType,
                 userName: this.userProfile.displayName,
                 pickupLocation: this.form.pickupLocation,
                 affiliation: this.form.affiliation,
@@ -213,24 +226,24 @@ export default {
                 cellPhone: this.form.cellPhone,
                 cellCarrier: this.form.cellCarrier
               })
-                this.products.forEach(item => {
-                  var orderDocRef = db.collection('Products').doc(item.id)
-                  return db.runTransaction(transaction => {
-                    return transaction.get(orderDocRef).then(orderDoc => {
-                      if (!orderDoc.exists) {
-                        console.log('Document does not exist!')
-                      }
-                      var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
-                      transaction.update(orderDocRef, { quantity: newQty })
-                    })
-                  }).then(function () {
-                    console.log('Transaction successfully committed!')
-                  }).catch(function (error) {
-                    console.log('Transaction failed: ', error)
+              this.products.forEach(item => {
+                var orderDocRef = db.collection('Products').doc(item.id)
+                return db.runTransaction(transaction => {
+                  return transaction.get(orderDocRef).then(orderDoc => {
+                    if (!orderDoc.exists) {
+                      console.log('Document does not exist!')
+                    }
+                    var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
+                    transaction.update(orderDocRef, { quantity: newQty })
                   })
+                }).then(function () {
+                  console.log('Transaction successfully committed!')
+                }).catch(function (error) {
+                  console.log('Transaction failed: ', error)
                 })
-                alert('Order Placed')
-                this.$store.dispatch('clearCart')
+              })
+              alert('Order Placed')
+              this.$store.dispatch('clearCart')
             }
           }
         }).catch(function (error) {
