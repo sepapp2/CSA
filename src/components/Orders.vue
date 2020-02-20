@@ -107,7 +107,7 @@ export default {
         { key: 'userName', label: 'Person Ordering', sortable: true, sortDirection: 'desc' },
         { key: 'orderDate', label: 'Order Date', 'class': 'text-center' },
         { key: 'orderTotal', label: 'Order Total' },
-        { key: 'paymentType', label: 'Payment Type' },
+        { key: 'paymentType', label: 'Payment Type', sortable: true, sortDirection: 'desc' },
         { key: 'actions', label: 'Actions' }
       ],
       currentPage: 1,
@@ -121,7 +121,7 @@ export default {
   },
   firestore () {
     return {
-      orders: db.collection('orders')
+      orders: db.collection('orders').orderBy('orderDate', 'desc')
     }
   },
   methods: {
