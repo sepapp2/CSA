@@ -45,7 +45,7 @@
             </b-form-group>
       </b-col>
   </b-row>
-  <b-row>
+  <!-- <b-row>
       <b-col cols="4" offset="8" align-h="right" class="text-right" align-self="end">
                 <b-form-textarea
                     id="orderNotes"
@@ -55,7 +55,7 @@
                     max-rows="6"
                 ></b-form-textarea>
       </b-col>
-  </b-row>
+  </b-row> -->
   <b-row v-show="products.length" class="mt-4">
       <b-col cols="12" align-h="right" class="text-right">
           <b-button variant="outline-success" size="lg" @click="checkout()">Place Order</b-button>
@@ -156,6 +156,7 @@ export default {
         { key: 'removeItem', label: 'Actions' }
       ],
       paymentType: null,
+      // orderNotes: null,
       form: {
         pickupLocation: null,
         affiliation: null,
@@ -225,7 +226,7 @@ export default {
                 orderDate: new Date(),
                 isFilled: false,
                 paymentType: this.paymentType,
-                orderNotes: this.orderNotes,
+                // orderNotes: this.orderNotes,
                 userName: this.userProfile.displayName,
                 pickupLocation: this.form.pickupLocation,
                 affiliation: this.form.affiliation,
