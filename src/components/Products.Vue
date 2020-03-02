@@ -21,12 +21,8 @@
     <!-- Admin Cards -->
     <b-card-group deck>
       <b-col cols="12" sm="12" md="6" lg="4" v-for="(product, idx) in filteredItems" :key="idx" class="product-card">
-        <b-card
-                :img-src= "product.productImage"
-                img-alt="Img"
-                img-top
-                img-fluid
-        >
+        <b-card>
+        <a :href="product.productImage" target="_blank">View Image</a>
                 <b-form-group id="productImageInputGroup"
                                 label="Replace Image"
                                 label-for="productImageInput">

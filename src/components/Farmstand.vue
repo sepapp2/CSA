@@ -6,12 +6,12 @@
           Store Currently Closed
         </template>
         <template slot="lead">
-          The CSA Farmstand store is currently closed.  Please come back again later. 
+          The CSA Farmstand store is currently closed.  Please come back again later.
         </template>
       </b-jumbotron>
     </div>
     <div v-if="storeStatus.status" class="store-front">
-      <b-button v-if="user.email == 'uk.csa@uky.edu'" @click="toggleView()" variant="outline-primary"class = "mobile-ordering">Toggle View</b-button>
+      <b-button v-if="user.email == 'uk.csa@uky.edu'" @click="toggleView()" variant="outline-primary" class = "mobile-ordering">Toggle View</b-button>
       <h5 v-if="!showAdmin">Filter List</h5>
         <b-row align-h="center" class="text-center mb-4" v-if="!showAdmin">
           <b-col cols="6" sm="12" md="6">

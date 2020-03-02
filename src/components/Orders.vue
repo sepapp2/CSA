@@ -1,34 +1,51 @@
 <template>
   <div class="orders">
     <h2>Orders</h2>
-    <b-row align-h="end">
-      <b-col md="1" class="my-1 centered">
-        <b-form-checkbox id="filledStatus"
+    <b-row class="mb-2" align-h="end">
+      <b-col md="2">
+        <b-form-checkbox class="my-2" id="filledStatus"
                          v-model="filledStatus"
                          >
             Show Filled
         </b-form-checkbox>
       </b-col>
-      <b-col cols="4" class="my-1">
-        <b-form-group horizontal label="Filter" class="mb-0">
+      <b-col md="2">
+        <datepicker v-model="startDate" name="startDate" input-class="form-control"></datepicker>
+      </b-col>
+      <b-col md="2">
+        <datepicker v-model="endDate" name="endDate" input-class="form-control"></datepicker>
+      </b-col>
+      <b-col cols="3">
           <b-input-group>
             <b-form-input v-model="filter" placeholder="Type to Search" />
             <b-input-group-append>
               <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
             </b-input-group-append>
           </b-input-group>
-        </b-form-group>
+      </b-col>
+      <b-col md="2">
+        <b-button-group>
+          <b-button variant="success" @click="fetchFilteredItems()">Search</b-button>
+          <download-excel
+            class = "btn btn-primary"
+            :fetch = "fetchData"
+            type    = "csv">
+            <icon name="download"></icon>
+            </download-excel>
+        </b-button-group>
       </b-col>
     </b-row>
     <!-- Main table element -->
     <b-table show-empty
              stacked="md"
-             :items="filledOrders"
+             :items="orders"
              :fields="fields"
              :current-page="currentPage"
              :per-page="perPage"
              :filter="filter"
              @filtered="onFiltered"
+             :total-rows="totalRows"
+
     >
       <template slot="userName" slot-scope="row">{{row.item.userName}}</template>
       <template slot="orderDate" slot-scope="row">{{row.item.orderDate | moment("MM/DD/YYYY")}}</template>
@@ -39,12 +56,12 @@
         <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
           View Order
         </b-button>
-        <b-button size="sm" v-if="row.item.isFilled" variant="success" @click.stop="markOrderFilled(row.item)" class="mr-1">
+        <!-- <b-button size="sm" v-if="row.item.isFilled" variant="success" @click.stop="markOrderFilled(row.item)" class="mr-1">
           Mark Not Filled
         </b-button>
         <b-button size="sm" v-if="!row.item.isFilled" variant="success" @click.stop="markOrderFilled(row.item)" class="mr-1">
           Mark Filled
-        </b-button>
+        </b-button> -->
         <b-button size="sm" variant="danger" @click.stop="deleteOrder(row.item)" class="mr-1">
           Delete Order
         </b-button>
@@ -72,6 +89,27 @@
                 <b-badge variant="primary" pill>{{item.quantity}}</b-badge>
               </b-list-group-item>
             </b-list-group>
+            <b-row>
+                <b-col cols="12" align-h="right" class="text-right">
+                      <h4 class="mt-2">Payment Method</h4>
+                        <b-form-radio-group id="radio-group" v-model="modalInfo.content.paymentType">
+                          <b-form-radio value="Cash">Cash</b-form-radio>
+                          <b-form-radio value="Check">Check</b-form-radio>
+                          <b-form-radio value="Credit Card">Credit Card</b-form-radio>
+                        </b-form-radio-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col cols="4" offset="8" align-h="right" class="text-right" align-self="end">
+                          <b-form-textarea
+                              id="orderNotes"
+                              v-model="modalInfo.content.orderNotes"
+                              placeholder="Notes"
+                              rows="3"
+                              max-rows="6"
+                          ></b-form-textarea>
+                </b-col>
+            </b-row>
             </b-card>
     </b-modal>
     </div>
@@ -79,9 +117,18 @@
 
 <script>
 import { db } from '../main'
+import Datepicker from 'vuejs-datepicker'
 
 export default {
   name: 'Orders',
+  components: {
+    Datepicker
+  },
+  firestore () {
+    return {
+      orders: db.collection('orders').where('orderDate', '>=', this.startDate).where('orderDate', '<=', this.endDate).orderBy('orderDate', 'desc')
+    }
+  },
   computed: {
     user () {
       return this.$store.getters.getUser
@@ -95,13 +142,13 @@ export default {
       })
     },
     totalRows () {
-      return this.orders.filter(order => {
-        return order.isFilled === this.filledStatus
-      }).length
+      return this.orders.length
     }
   },
   data () {
     return {
+      startDate: Date.now(),
+      endDate: Date.now(),
       orders: [],
       fields: [
         { key: 'userName', label: 'Person Ordering', sortable: true, sortDirection: 'desc' },
@@ -116,16 +163,43 @@ export default {
       filter: null,
       filledStatus: false,
       showFilledOrders: [],
+      paymentType: null,
+      orderNotes: '',
       modalInfo: { title: '', content: '' }
     }
   },
-  firestore () {
-    return {
-      orders: db.collection('orders').orderBy('orderDate', 'desc')
-    }
-  },
   methods: {
+    fetchFilteredItems () {
+      this.orders = []
+      db.collection('orders').where('orderDate', '>=', new Date(this.startDate)).where('orderDate', '<=', new Date(this.endDate)).where('isFilled', '==', this.filledStatus).orderBy('orderDate', 'desc')
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            var orderInfo = doc.data()
+            orderInfo.id = doc.id
+            this.orders.push(orderInfo)
+          })
+        })
+        .catch(function (error) {
+          console.log('Error getting documents: ', error)
+        })
+    },
+    async fetchData () {
+      const downloadCSV = this.orders.filter(order => order.orderDate > new Date(this.startDate) && order.orderDate < this.endDate)
+      downloadCSV.forEach(orderDetail => {
+        orderDetail.order.forEach(item => {
+          delete item.description
+          delete item.quantityLabel
+          delete item.quantityLimit
+          delete item.userName
+          return JSON.stringify(item)
+        })
+        orderDetail.order = JSON.stringify(orderDetail.order)
+      })
+      return downloadCSV
+    },
     info (item, index, button) {
+      console.log(item)
       this.modalInfo.title = `Order for ${item.userName}`
       this.modalInfo.content = item
       if (this.modalInfo.content.isFilled) {
@@ -141,7 +215,7 @@ export default {
     },
     onFiltered (filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length
+      this.totalRows = this.orders.length
       this.currentPage = 1
     },
     deleteOrder (evt) {
@@ -168,18 +242,16 @@ export default {
       })
     },
     markOrderFilled (evt) {
-      // Create a reference to the SF doc.
-      console.log(evt.id)
-      var sfDocRef = db.collection('orders').doc(evt.id)
+      var docRef = db.collection('orders').doc(evt.id)
       return db.runTransaction(function (transaction) {
-        return transaction.get(sfDocRef).then(function (sfDoc) {
-          if (!sfDoc.exists) {
+        return transaction.get(docRef).then(function (doc) {
+          if (!doc.exists) {
             console.log('Document does not exist!')
           }
-          if (sfDoc.data().isFilled) {
-            transaction.update(sfDocRef, { isFilled: false })
+          if (doc.data().isFilled) {
+            transaction.update(docRef, { isFilled: false, paymentType: evt.paymentType, orderNotes: evt.orderNotes })
           } else {
-            transaction.update(sfDocRef, { isFilled: true })
+            transaction.update(docRef, { isFilled: true, paymentType: evt.paymentType, orderNotes: evt.orderNotes })
           }
         })
       }).then(function () {
