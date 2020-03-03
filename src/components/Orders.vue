@@ -192,14 +192,15 @@ export default {
           delete item.quantityLabel
           delete item.quantityLimit
           delete item.userName
+          delete item.id
           return JSON.stringify(item)
         })
         orderDetail.order = JSON.stringify(orderDetail.order)
+        orderDetail.orderTotal = parseFloat(orderDetail.orderTotal)
       })
       return downloadCSV
     },
     info (item, index, button) {
-      console.log(item)
       this.modalInfo.title = `Order for ${item.userName}`
       this.modalInfo.content = item
       if (this.modalInfo.content.isFilled) {
