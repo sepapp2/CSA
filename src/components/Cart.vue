@@ -35,7 +35,7 @@
       </b-col>
   </b-row>
   <b-row>
-      <b-col cols="12" align-h="right" class="text-right">
+      <b-col cols="12" v-if="user.email == 'uk.csa@uky.edu'" align-h="right" class="text-right">
             <b-form-group label="Payment Method">
               <b-form-radio-group id="radio-group" v-model="paymentType" >
                 <b-form-radio value="Cash">Cash</b-form-radio>
@@ -46,7 +46,7 @@
       </b-col>
   </b-row>
   <b-row>
-      <b-col cols="4" offset="8" align-h="right" class="text-right" align-self="end">
+      <b-col cols="4" v-if="user.email == 'uk.csa@uky.edu'" offset="8" align-h="right" class="text-right" align-self="end">
                 <b-form-textarea
                     id="orderNotes"
                     v-model="orderNotes"
