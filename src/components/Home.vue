@@ -37,7 +37,7 @@
         </b-row>
       </div>
     <b-card-group deck v-if="!showAdmin">
-          <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx" v-if="product.quantity>0">
+          <b-col cols="12" sm="12" md="4" lg="3" v-for="(product, idx) in filteredItems" :key="idx">
             <b-card :title="product.name"
                     :img-src= "product.productImage"
                     img-alt="Img"
@@ -45,6 +45,7 @@
                     img-fluid
                     class="product-card"
             >
+             <div class="sold_out" v-if="product.quantity==0">Sold out</div>
                 <p class="card-text">
                     <div class="text-muted" v-if="product.displayQuantity">
                       Quantity Available: {{ product.quantity }}
@@ -55,7 +56,7 @@
                     <div>
                     {{ product.description }}
                     </div>
-                <div slot="footer">
+                <div slot="footer" v-if="product.quantity>0">
                     <small class="text-muted">Last updated {{ product.modifiedDtm | moment("from", "now", true) }} ago</small>
                     <b-row align-h="center" class="text-center">
                       <b-col cols="10">
@@ -147,11 +148,43 @@ a {
 }
 .product-card {
   margin-bottom: 15px!important;
+  overflow: hidden;
 }
 .jumbotron {
   border-radius: 0px;
 }
 .mobile-ordering {
   margin-bottom: 15px;
+}
+.sold_out {
+    top: 2em;
+    left: -4em;
+    color: #fff;
+    display: block;
+    position:absolute;
+    text-align: center;
+    text-decoration: none;
+    letter-spacing: .06em;
+    background-color: #A00;
+    padding: 0.5em 5em 0.4em 5em;
+    text-shadow: 0 0 0.75em #444;
+    box-shadow: 0 0 0.5em rgba(0,0,0,0.5);
+    font: bold 16px/1.2em Arial, Sans-Serif;
+    -webkit-text-shadow: 0 0 0.75em #444;
+    -webkit-box-shadow: 0 0 0.5em rgba(0,0,0,0.5);
+    -webkit-transform: rotate(-45deg) scale(0.75,1);
+    z-index:10;
+}
+.sold_out:before {
+    content: '';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    margin: -0.3em -5em;
+    transform: scale(0.7);
+    -webkit-transform: scale(0.7);
+    border: 2px rgba(255,255,255,0.7) dashed;
 }
 </style>
