@@ -203,11 +203,27 @@ export default {
         this.$refs.myModalRef.show()
         return
       }
+      this.products.forEach(item => {
+        var orderDocRef = db.collection('Products').doc(item.id)
+        return db.runTransaction(transaction => {
+          return transaction.get(orderDocRef).then(orderDoc => {
+            if (!orderDoc.exists) {
+              console.log('Document does not exist!')
+            }
+            var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
+            transaction.update(orderDocRef, { quantity: newQty })
+          })
+        }).then(function () {
+          console.log('Transaction successfully committed!')
+        }).catch(function (error) {
+          console.log('Transaction failed: ', error)
+        })
+      })
       this.products.forEach(product => {
         var docRef = db.collection('Products').doc(product.id)
         docRef.get().then(doc => {
-          if (doc.exists && (parseInt(product.quantity) > parseInt(doc.data().quantity))) {
-            alert('Only ' + doc.data().quantity + ' ' + product.name + ' are available at this time.  Please edit your quantity and try again')
+          if (doc.exists && (parseInt(doc.data().quantity) < 0)) {
+            alert('Only ' + (parseInt(doc.data().quantity) + parseInt(product.quantity)) + ' ' + product.name + ' are available at this time.  Please edit your quantity and try again')
             placeOrder = false
           } else if (doc.exists && (parseInt(product.quantity) > parseInt(product.quantityLimit))) {
             alert('You are trying to order more than the allowed limit of ' + product.quantityLimit + '.  Please change the amount in your cart and try again.')
@@ -239,6 +255,9 @@ export default {
                 cellPhone: this.form.cellPhone,
                 cellCarrier: this.form.cellCarrier
               })
+              alert('Order Placed')
+              this.$store.dispatch('clearCart')
+            } else if (!placeOrder && productCount === this.products.length) {
               this.products.forEach(item => {
                 var orderDocRef = db.collection('Products').doc(item.id)
                 return db.runTransaction(transaction => {
@@ -246,7 +265,7 @@ export default {
                     if (!orderDoc.exists) {
                       console.log('Document does not exist!')
                     }
-                    var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
+                    var newQty = parseInt(orderDoc.data().quantity) + parseInt(item.quantity)
                     transaction.update(orderDocRef, { quantity: newQty })
                   })
                 }).then(function () {
@@ -255,8 +274,6 @@ export default {
                   console.log('Transaction failed: ', error)
                 })
               })
-              alert('Order Placed')
-              this.$store.dispatch('clearCart')
             }
           }
         }).catch(function (error) {
