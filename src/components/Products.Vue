@@ -286,12 +286,12 @@ export default {
           }
           var updateDate = new Date()
           transaction.update(sfDocRef, {
-            quantity: product.quantity,
+            quantity: parseInt(product.quantity),
             quantityLabel: product.quantityLabel,
             displayPublic: product.displayPublic,
             displayQuantity: product.displayQuantity,
             limitQuantityAllowed: product.limitQuantityAllowed,
-            limitQuantity: product.limitQuantity,
+            limitQuantity: parseInt(product.limitQuantity),
             price: product.price,
             modifiedDtm: updateDate,
             name: product.name,

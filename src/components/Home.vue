@@ -44,6 +44,7 @@
                     img-top
                     img-fluid
                     class="product-card"
+                    v-if="product.quantity>=0"
             >
              <div class="sold_out" v-if="product.quantity==0">Sold out</div>
                 <p class="card-text">

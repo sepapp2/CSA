@@ -147,6 +147,7 @@ export default {
   },
   data () {
     return {
+      availableProducts: [],
       fields: [
         { key: 'name', label: 'Product Name' },
         { key: 'description', label: 'Product Description' },
@@ -195,10 +196,16 @@ export default {
       }, 0)
     }
   },
+  firestore () {
+    return {
+      availableProducts: db.collection('Products').where('active', '==', true).where('displayPublic', '==', true).orderBy('name', 'asc')
+    }
+  },
   methods: {
     checkout () {
       let productCount = 0
-      let placeOrder = true
+      var orderInformation = this
+      let qtyNegative = false
       if (this.products.filter(order => order.quantityLabel === 'Share').length > 0 && this.formValid === false) {
         this.$refs.myModalRef.show()
         return
@@ -210,74 +217,58 @@ export default {
             if (!orderDoc.exists) {
               console.log('Document does not exist!')
             }
-            var newQty = parseInt(orderDoc.data().quantity) - parseInt(item.quantity)
+            var newQty = (parseInt(orderDoc.data().quantity)) - (parseInt(item.quantity))
+            if (newQty < 0) {
+              qtyNegative = true
+            }
+            productCount++
             transaction.update(orderDocRef, { quantity: newQty })
           })
         }).then(function () {
           console.log('Transaction successfully committed!')
-        }).catch(function (error) {
-          console.log('Transaction failed: ', error)
-        })
-      })
-      this.products.forEach(product => {
-        var docRef = db.collection('Products').doc(product.id)
-        docRef.get().then(doc => {
-          if (doc.exists && (parseInt(doc.data().quantity) < 0)) {
-            alert('Only ' + (parseInt(doc.data().quantity) + parseInt(product.quantity)) + ' ' + product.name + ' are available at this time.  Please edit your quantity and try again')
-            placeOrder = false
-          } else if (doc.exists && (parseInt(product.quantity) > parseInt(product.quantityLimit))) {
-            alert('You are trying to order more than the allowed limit of ' + product.quantityLimit + '.  Please change the amount in your cart and try again.')
-            placeOrder = false
-          } else if (!doc.exists) {
-            alert(product.name + ' is no longer available for purchase')
-            placeOrder = false
-          } else {
-            productCount++
-            if (placeOrder && productCount === this.products.length) {
-              db.collection('orders').add({
-                uid: this.user.uid,
-                userOrdering: this.userProfile,
-                order: this.products,
-                orderTotal: this.total,
-                orderDate: new Date(),
-                isFilled: false,
-                paymentType: this.paymentType,
-                orderNotes: this.orderNotes,
-                userName: this.userProfile.displayName,
-                pickupLocation: this.form.pickupLocation,
-                affiliation: this.form.affiliation,
-                textReminders: this.form.texts,
-                partnerFirstName: this.form.partnerFirstName,
-                partnerLastName: this.form.partnerLastName,
-                partnerEmail: this.form.partnerEmail,
-                paymentMethod: this.form.paymentMethod,
-                paymentPlan: this.form.paymentPlan,
-                cellPhone: this.form.cellPhone,
-                cellCarrier: this.form.cellCarrier
-              })
-              alert('Order Placed')
-              this.$store.dispatch('clearCart')
-            } else if (!placeOrder && productCount === this.products.length) {
-              this.products.forEach(item => {
-                var orderDocRef = db.collection('Products').doc(item.id)
-                return db.runTransaction(transaction => {
-                  return transaction.get(orderDocRef).then(orderDoc => {
-                    if (!orderDoc.exists) {
-                      console.log('Document does not exist!')
-                    }
-                    var newQty = parseInt(orderDoc.data().quantity) + parseInt(item.quantity)
-                    transaction.update(orderDocRef, { quantity: newQty })
-                  })
-                }).then(function () {
-                  console.log('Transaction successfully committed!')
-                }).catch(function (error) {
-                  console.log('Transaction failed: ', error)
+          if (!qtyNegative && productCount === orderInformation.products.length) {
+            db.collection('orders').add({
+              uid: orderInformation.user.uid,
+              userOrdering: orderInformation.userProfile,
+              order: orderInformation.products,
+              orderTotal: orderInformation.total,
+              orderDate: new Date(),
+              isFilled: false,
+              paymentType: orderInformation.paymentType,
+              orderNotes: orderInformation.orderNotes,
+              userName: orderInformation.userProfile.displayName,
+              pickupLocation: orderInformation.form.pickupLocation,
+              affiliation: orderInformation.form.affiliation,
+              textReminders: orderInformation.form.texts,
+              partnerFirstName: orderInformation.form.partnerFirstName,
+              partnerLastName: orderInformation.form.partnerLastName,
+              partnerEmail: orderInformation.form.partnerEmail,
+              paymentMethod: orderInformation.form.paymentMethod,
+              paymentPlan: orderInformation.form.paymentPlan,
+              cellPhone: orderInformation.form.cellPhone,
+              cellCarrier: orderInformation.form.cellCarrier
+            })
+            alert('Order Placed')
+            orderInformation.$store.dispatch('clearCart')
+          } else if (qtyNegative && productCount === orderInformation.products.length) {
+            orderInformation.products.forEach(item => {
+              var orderDocRef = db.collection('Products').doc(item.id)
+              return db.runTransaction(transaction => {
+                return transaction.get(orderDocRef).then(orderDoc => {
+                  if (!orderDoc.exists) {
+                    console.log('Document does not exist!')
+                  }
+                  alert('There are now only ' + (parseInt(orderDoc.data().quantity) + parseInt(item.quantity)) + ' available of ' + item.name + '.  Please edit your cart and try again.')
+                  var newQty = (parseInt(orderDoc.data().quantity)) + (parseInt(item.quantity))
+                  transaction.update(orderDocRef, { quantity: newQty })
                 })
+              }).then(function () {
+                console.log('Transaction successfully committed!')
+              }).catch(function (error) {
+                console.log('Transaction failed: ', error)
               })
-            }
+            })
           }
-        }).catch(function (error) {
-          console.log('Error getting document:', error)
         })
       })
     },
